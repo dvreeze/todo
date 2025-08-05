@@ -1,0 +1,15 @@
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.1">
+    <persistence-unit name="todo" transaction-type="RESOURCE_LOCAL">
+        <description>todo list</description>
+        <class>eu.cdevreeze.todo.entity.AddressEntity</class>
+        <class>eu.cdevreeze.todo.entity.AppointmentEntity</class>
+        <class>eu.cdevreeze.todo.entity.TaskEntity</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <properties>
+            <!-- Not working yet? -->
+            <property name="jakarta.persistence.schema-generation.create-script-source" value="../h2/create-db.sql"/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+            <property name="jakarta.persistence.sql-load-script-source" value="../h2/load-init-data.sql"/>
+        </properties>
+    </persistence-unit>
+</persistence>
