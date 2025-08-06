@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.todo.service;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.entity.AppointmentEntity;
 import eu.cdevreeze.todo.entity.TaskEntity;
@@ -66,6 +67,18 @@ public class DefaultTodoService implements TodoService {
                     .getResultStream()
                     .map(TaskEntity::toModel)
                     .collect(ImmutableList.toImmutableList());
+        }
+    }
+
+    @Override
+    public Task addTask(Task task) {
+        try (EntityManager em = emf.createEntityManager()) {
+            Preconditions.checkArgument(task.idOption().isEmpty());
+            TaskEntity taskEntity = TaskEntity.fromModel(task);
+
+            em.persist(taskEntity);
+
+            return taskEntity.toModel();
         }
     }
 

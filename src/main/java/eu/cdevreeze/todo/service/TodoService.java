@@ -33,6 +33,8 @@ public interface TodoService {
 
     ImmutableList<Task> filterTasks(boolean isClosed);
 
+    Task addTask(Task task);
+
     ImmutableList<Task> findTasksHavingTargetEndAfter(Instant end);
 
     ImmutableList<Task> findTasksHavingTargetEndBefore(Instant end);

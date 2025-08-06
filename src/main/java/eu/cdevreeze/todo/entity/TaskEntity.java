@@ -111,4 +111,14 @@ public class TaskEntity {
                 closed
         );
     }
+
+    public static TaskEntity fromModel(Task task) {
+        TaskEntity entity = new TaskEntity();
+        entity.setName(task.name());
+        entity.setDescription(task.description());
+        entity.setTargetEnd(task.targetEndOption().orElse(null));
+        entity.setExtraInformation(task.extraInformationOption().orElse(null));
+        entity.setClosed(task.closed());
+        return entity;
+    }
 }

@@ -33,4 +33,14 @@ public record Task(
         Optional<String> extraInformationOption,
         boolean closed
 ) {
+
+    public static Task newTask(
+            String name,
+            String description,
+            Optional<Instant> targetEndOption,
+            Optional<String> extraInformationOption,
+            boolean closed
+    ) {
+        return new Task(OptionalLong.empty(), name, description, targetEndOption, extraInformationOption, closed);
+    }
 }
