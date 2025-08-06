@@ -1,12 +1,13 @@
 create table Address (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  address_line1 VARCHAR(500) NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  address_line1 VARCHAR(500),
   address_line2 VARCHAR(500),
   address_line3 VARCHAR(500),
   address_line4 VARCHAR(500),
   zip_code VARCHAR(20) NOT NULL,
   city VARCHAR(75) NOT NULL,
-  country_code VARCHAR(3) NOT NULL
+  country_code VARCHAR(3) NOT NULL DEFAULT 'NL'
 );
 
 create table Appointment (

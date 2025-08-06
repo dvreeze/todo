@@ -27,6 +27,7 @@ import java.util.OptionalLong;
  */
 public record Address(
         OptionalLong idOption,
+        String addressName,
         ImmutableList<String> addressLines,
         String zipCode,
         String city,

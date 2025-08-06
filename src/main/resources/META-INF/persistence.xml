@@ -6,10 +6,7 @@
         <class>eu.cdevreeze.todo.entity.TaskEntity</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
-            <!-- Not working yet? -->
-            <property name="jakarta.persistence.schema-generation.create-script-source" value="../h2/create-db.sql"/>
-            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
-            <property name="jakarta.persistence.sql-load-script-source" value="../h2/load-init-data.sql"/>
+            <!-- Left empty. See https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384. -->
         </properties>
     </persistence-unit>
 </persistence>

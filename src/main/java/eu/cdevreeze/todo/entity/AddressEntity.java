@@ -38,7 +38,10 @@ public class AddressEntity {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "address_line1", nullable = false)
+    @Column(name = "name", nullable = false)
+    private String addressName;
+
+    @Column(name = "address_line1")
     private String addressLine1;
 
     @Column(name = "address_line2")
@@ -65,6 +68,14 @@ public class AddressEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getAddressName() {
+        return addressName;
+    }
+
+    public void setAddressName(String addressName) {
+        this.addressName = addressName;
     }
 
     public String getAddressLine1() {
@@ -126,6 +137,7 @@ public class AddressEntity {
     public Address toModel() {
         return new Address(
                 Stream.ofNullable(id).mapToLong(i -> i).findFirst(),
+                addressName,
                 Stream.of(addressLine1, addressLine2, addressLine3, addressLine4)
                         .filter(Objects::nonNull)
                         .collect(ImmutableList.toImmutableList()),
