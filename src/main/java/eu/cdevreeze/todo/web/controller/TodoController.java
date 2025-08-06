@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.todo.web.controller;
 
+import eu.cdevreeze.todo.model.Appointment;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TodoService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,5 +41,10 @@ public class TodoController {
     @GetMapping("/tasks.json")
     public List<Task> findAllTasks() {
         return todoService.findAllTasks();
+    }
+
+    @GetMapping("/appointments.json")
+    public List<Appointment> findAllAppointments() {
+        return todoService.findAllAppointments();
     }
 }

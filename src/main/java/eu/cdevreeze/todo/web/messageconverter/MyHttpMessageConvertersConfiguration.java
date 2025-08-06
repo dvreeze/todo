@@ -20,11 +20,16 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Configuration class containing a {@link HttpMessageConverters} bean.
@@ -35,16 +40,35 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 public class MyHttpMessageConvertersConfiguration {
 
     // See https://github.com/FasterXML/jackson-datatypes-collections
+    // Also see https://www.baeldung.com/java-instant-jackson-format-object-mapper
 
     @Bean
     public HttpMessageConverters customConverters() {
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(Instant.class, new CustomInstantSerializer());
+        javaTimeModule.addDeserializer(Instant.class, new CustomInstantDeserializer());
+
         HttpMessageConverter<?> converter = new MappingJackson2HttpMessageConverter(
                 JsonMapper.builder()
                         .addModule(new GuavaModule())
                         .addModule(new Jdk8Module())
-                        .addModule(new JavaTimeModule())
+                        .addModule(javaTimeModule)
                         .build()
         );
         return new HttpMessageConverters(converter);
+    }
+
+    private static final class CustomInstantSerializer extends InstantSerializer {
+
+        public CustomInstantSerializer() {
+            super(InstantSerializer.INSTANCE, false, false, DateTimeFormatter.ISO_INSTANT);
+        }
+    }
+
+    private static final class CustomInstantDeserializer extends InstantDeserializer<Instant> {
+
+        public CustomInstantDeserializer() {
+            super(InstantDeserializer.INSTANT, DateTimeFormatter.ISO_INSTANT);
+        }
     }
 }
