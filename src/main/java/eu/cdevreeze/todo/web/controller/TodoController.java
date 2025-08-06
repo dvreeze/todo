@@ -20,6 +20,7 @@ import eu.cdevreeze.todo.model.Appointment;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TodoService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -38,9 +39,15 @@ public class TodoController {
         this.todoService = todoService;
     }
 
-    @GetMapping("/tasks.json")
-    public List<Task> findAllTasks() {
-        return todoService.findAllTasks();
+    @GetMapping(value = "/tasks.json")
+    public List<Task> findAllTasks(
+            @RequestParam(name = "closed", required = false) Boolean isClosed
+    ) {
+        if (isClosed == null) {
+            return todoService.findAllTasks();
+        } else {
+            return todoService.filterTasks(isClosed);
+        }
     }
 
     @GetMapping("/appointments.json")

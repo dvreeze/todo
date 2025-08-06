@@ -25,5 +25,6 @@ create table Task (
   name VARCHAR(100) NOT NULL,
   description VARCHAR(1000) NOT NULL,
   target_end TIMESTAMP,
-  extra_information VARCHAR(1000)
+  extra_information VARCHAR(1000),
+  closed BOOLEAN NOT NULL DEFAULT FALSE
 );

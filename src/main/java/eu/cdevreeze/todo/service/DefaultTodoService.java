@@ -57,6 +57,19 @@ public class DefaultTodoService implements TodoService {
     }
 
     @Override
+    public ImmutableList<Task> filterTasks(boolean isClosed) {
+        try (EntityManager em = emf.createEntityManager()) {
+            String jpaQuery = "select t from Task t where closed = :closed";
+
+            return em.createQuery(jpaQuery, TaskEntity.class)
+                    .setParameter("closed", isClosed)
+                    .getResultStream()
+                    .map(TaskEntity::toModel)
+                    .collect(ImmutableList.toImmutableList());
+        }
+    }
+
+    @Override
     public ImmutableList<Task> findTasksHavingTargetEndAfter(Instant end) {
         try (EntityManager em = emf.createEntityManager()) {
             String jpaQuery = "select t from Task t where t.targetEnd > :end";

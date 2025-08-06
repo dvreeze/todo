@@ -50,6 +50,9 @@ public class TaskEntity {
     @Column(name = "extra_information")
     private String extraInformation;
 
+    @Column(name = "closed", nullable = false)
+    private Boolean closed;
+
     public Long getId() {
         return id;
     }
@@ -90,13 +93,22 @@ public class TaskEntity {
         this.extraInformation = extraInformation;
     }
 
+    public Boolean getClosed() {
+        return closed;
+    }
+
+    public void setClosed(Boolean closed) {
+        this.closed = closed;
+    }
+
     public Task toModel() {
         return new Task(
                 Stream.ofNullable(id).mapToLong(i -> i).findFirst(),
                 name,
                 description,
                 Optional.ofNullable(targetEnd),
-                Optional.ofNullable(extraInformation)
+                Optional.ofNullable(extraInformation),
+                closed
         );
     }
 }

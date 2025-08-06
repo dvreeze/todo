@@ -30,6 +30,7 @@ public record Task(
         String name,
         String description,
         Optional<Instant> targetEndOption,
-        Optional<String> extraInformationOption
+        Optional<String> extraInformationOption,
+        boolean closed
 ) {
 }
