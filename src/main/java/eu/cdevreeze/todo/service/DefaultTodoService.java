@@ -127,7 +127,7 @@ public class DefaultTodoService implements TodoService {
         EntityGraph<AppointmentEntity> eg = entityManager.createEntityGraph(AppointmentEntity.class);
         eg.addAttributeNodes("address");
 
-        String jpaQuery = "select ap from Appointment ap where ap.start >= :start and ap.end > :end";
+        String jpaQuery = "select ap from Appointment ap where ap.start >= :start and ap.end < :end";
 
         return entityManager.createQuery(jpaQuery, AppointmentEntity.class)
                 .setParameter("start", start)
