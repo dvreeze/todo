@@ -17,10 +17,7 @@
 package eu.cdevreeze.todo.entity;
 
 import eu.cdevreeze.todo.model.Task;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -35,7 +32,8 @@ import java.util.stream.Stream;
 public class TaskEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Task_seq_gen")
+    @SequenceGenerator(name = "Task_seq_gen", sequenceName = "Task_seq", allocationSize = 1)
     private Long id;
 
     @Column(nullable = false)

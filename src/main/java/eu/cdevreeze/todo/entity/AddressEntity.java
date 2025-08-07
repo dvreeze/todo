@@ -18,10 +18,7 @@ package eu.cdevreeze.todo.entity;
 
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.model.Address;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -35,7 +32,8 @@ import java.util.stream.Stream;
 public class AddressEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Address_seq_gen")
+    @SequenceGenerator(name = "Address_seq_gen", sequenceName = "Address_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "name", nullable = false)

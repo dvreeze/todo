@@ -1,0 +1,95 @@
+
+# PostgreSQL database initialization
+
+## Creating and initializing the PostgreSQL database
+
+Here the PostgreSQL database server is assumed to be a Docker container.
+
+It is not initialized by the application, but must be initialized manually by the user
+before running the application. That is, the user must run `create-db.sql` followed by
+`load-init-data.sql`.
+
+See [PostgreSQL Docker setup](https://www.baeldung.com/ops/postgresql-docker-setup) for a good article
+on setting up PostgreSQL Docker containers. Also see
+[how to use PostgreSQL Docker official image](https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/).
+
+Steps:
+
+```shell
+# First "cd" into the root directory of this project
+
+docker pull postgres
+
+mkdir ~/postgresdata
+
+# Note we do not create any volume, in order to avoid "role does not exist" issues.
+
+docker run -d \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=postgres \
+  -p 5432:5432 \
+  -v ~/postgresdata:/var/lib/postgresql/data \
+  --name postgresql \
+  postgres
+
+docker cp ./src/main/resources/db/create-db.sql postgresql:/tmp
+docker cp ./src/main/resources/db/load-init-data.sql postgresql:/tmp
+
+docker exec -it postgresql psql -U postgres
+
+# We are now inside the running postgresql container, inside psql
+
+CREATE DATABASE tododb;
+# Check database "tododb" exists
+\list
+
+# Help
+\?
+
+\c tododb
+
+\i /tmp/create-db.sql
+\i /tmp/load-init-data.sql
+
+# Displaying the tables
+\dt
+
+\d task
+
+# Querying, but remember to add a semicolon at the end or else it does not work
+select * from task;
+
+\q
+
+# We have left the running postgres container again
+```
+
+Now we can run the application against this database.
+
+## Running the app, after one-time database initialization
+
+Starting and stopping the application, after one-time database initialization:
+
+```bash
+mvn spring-boot:start
+
+# Adding a task (as JSON)
+curl -v \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{ "name": "mail regelen", "description": "nieuwe mail provider gebruiken", "targetEndOption": "2025-09-01T00:00:00Z", "extraInformationOption": null, "closed": false }' \
+  http://localhost:8080/tasks.json
+
+mvn spring-boot:stop
+```
+
+After starting the application, point the browser at `http://localhost:8080/tasks.json`, for example.
+
+If after stopping the application port 8080 is still occupied, find the corresponding process and bring
+that process down. In Linux:
+
+```bash
+# Find the culprit
+lsof -i :8080
+```

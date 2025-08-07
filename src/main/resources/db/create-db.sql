@@ -1,5 +1,9 @@
+create sequence Address_seq;
+create sequence Appointment_seq;
+create sequence Task_seq;
+
 create table Address (
-  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  id BIGINT NOT NULL DEFAULT nextval('Address_seq') PRIMARY KEY,
   name VARCHAR(50) NOT NULL,
   address_line1 VARCHAR(500),
   address_line2 VARCHAR(500),
@@ -11,7 +15,7 @@ create table Address (
 );
 
 create table Appointment (
-  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  id BIGINT NOT NULL DEFAULT nextval('Appointment_seq') PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   start TIMESTAMP NOT NULL,
   end_date_time TIMESTAMP NOT NULL,
@@ -21,7 +25,7 @@ create table Appointment (
 );
 
 create table Task (
-  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  id BIGINT NOT NULL DEFAULT nextval('Task_seq') PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   description VARCHAR(1000) NOT NULL,
   target_end TIMESTAMP,

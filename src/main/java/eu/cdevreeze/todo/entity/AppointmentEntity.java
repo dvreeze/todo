@@ -32,7 +32,8 @@ import java.util.stream.Stream;
 public class AppointmentEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Appointment_seq_gen")
+    @SequenceGenerator(name = "Appointment_seq_gen", sequenceName = "Appointment_seq", allocationSize = 1)
     private Long id;
 
     @Column(nullable = false)
