@@ -84,7 +84,7 @@ curl -v \
 curl -v \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
-  -d '{ "name": "mail regelen", "description": "nieuwe mail provider gebruiken", "targetEndOption": "2025-09-01T00:00:00Z", "extraInformationOption": null, "closed": false }' \
+  -d '{ "name": "mail regelen", "description": "overgaan op nieuwe mail provider", "targetEndOption": "2025-09-01T00:00:00Z", "extraInformationOption": null, "closed": false }' \
   http://localhost:8080/tasks.json
 
 # When we are ready to stop the application..
