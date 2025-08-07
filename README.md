@@ -2,4 +2,4 @@
 
 This project is used to maintain a todo list, appointments etc.
 
-See [readme DB](src/main/resources/db/readme-db) for initializing the database.
+See [readme DB](src/main/resources/db/readme-db.md) for initializing the database.
