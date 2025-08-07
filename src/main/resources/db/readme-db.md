@@ -3,11 +3,11 @@
 
 ## Creating and initializing the PostgreSQL database
 
-Here the PostgreSQL database server is assumed to be a Docker container.
+Here the PostgreSQL database server is assumed to be a Docker container, although it does not have to be.
 
-It is not initialized by the application, but must be initialized manually by the user
+The database is not initialized by the application, but must be initialized manually by the user
 before running the application. That is, the user must run `create-db.sql` followed by
-`load-init-data.sql`.
+`load-init-data.sql` (one time), after starting the database server for the first time.
 
 See [PostgreSQL Docker setup](https://www.baeldung.com/ops/postgresql-docker-setup) for a good article
 on setting up PostgreSQL Docker containers. Also see
@@ -69,10 +69,16 @@ Now we can run the application against this database.
 
 ## Running the app, after one-time database initialization
 
-Starting and stopping the application, after one-time database initialization:
+Starting and stopping the application, after one-time database initialization, and after
+starting the PostgreSQL Docker container:
 
 ```bash
 mvn spring-boot:start
+
+# Querying for tasks (we can do that in the browser too, of course)
+curl -v \
+  -H 'Accept: application/json' \
+  http://localhost:8080/tasks.json
 
 # Adding a task (as JSON)
 curl -v \
@@ -81,10 +87,9 @@ curl -v \
   -d '{ "name": "mail regelen", "description": "nieuwe mail provider gebruiken", "targetEndOption": "2025-09-01T00:00:00Z", "extraInformationOption": null, "closed": false }' \
   http://localhost:8080/tasks.json
 
+# When we are ready to stop the application..
 mvn spring-boot:stop
 ```
-
-After starting the application, point the browser at `http://localhost:8080/tasks.json`, for example.
 
 If after stopping the application port 8080 is still occupied, find the corresponding process and bring
 that process down. In Linux:

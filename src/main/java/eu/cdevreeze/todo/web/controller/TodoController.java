@@ -50,9 +50,7 @@ public class TodoController {
     }
 
     @PostMapping(value = "/tasks.json", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Task addTask(
-            @RequestBody Task task
-    ) {
+    public Task addTask(@RequestBody Task task) {
         return todoService.addTask(task);
     }
 
