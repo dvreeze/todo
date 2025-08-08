@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.todo.web.controller;
 
+import com.google.common.base.Preconditions;
 import eu.cdevreeze.todo.model.Address;
 import eu.cdevreeze.todo.model.Appointment;
 import eu.cdevreeze.todo.model.Task;
@@ -23,6 +24,7 @@ import eu.cdevreeze.todo.service.TodoService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -66,8 +68,17 @@ public class TodoController {
     }
 
     @GetMapping(value = "/appointments.json", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Appointment> findAllAppointments() {
-        return todoService.findAllAppointments();
+    public List<Appointment> findAllAppointments(
+            @RequestParam(name = "start", required = false) Instant start,
+            @RequestParam(name = "end", required = false) Instant end
+    ) {
+        if (start == null) {
+            Preconditions.checkArgument(end == null);
+            return todoService.findAllAppointments();
+        } else {
+            Preconditions.checkArgument(end != null);
+            return todoService.findAppointmentsBetween(start, end);
+        }
     }
 
     @PostMapping(value = "/appointments.json", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
