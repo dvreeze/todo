@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.todo.web.controller;
 
+import eu.cdevreeze.todo.model.Address;
 import eu.cdevreeze.todo.model.Appointment;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TodoService;
@@ -54,8 +55,23 @@ public class TodoController {
         return todoService.addTask(task);
     }
 
+    @GetMapping(value = "/addresses.json", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Address> findAllAddresses() {
+        return todoService.findAllAddresses();
+    }
+
+    @PostMapping(value = "/addresses.json", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Address addAddress(@RequestBody Address address) {
+        return todoService.addAddress(address);
+    }
+
     @GetMapping(value = "/appointments.json", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Appointment> findAllAppointments() {
         return todoService.findAllAppointments();
+    }
+
+    @PostMapping(value = "/appointments.json", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Appointment addAppointment(@RequestBody Appointment appointment) {
+        return todoService.addAppointment(appointment);
     }
 }

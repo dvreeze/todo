@@ -111,12 +111,13 @@ public class TaskEntity {
     }
 
     public static TaskEntity fromModel(Task task) {
-        TaskEntity entity = new TaskEntity();
-        entity.setName(task.name());
-        entity.setDescription(task.description());
-        entity.setTargetEnd(task.targetEndOption().orElse(null));
-        entity.setExtraInformation(task.extraInformationOption().orElse(null));
-        entity.setClosed(task.closed());
-        return entity;
+        TaskEntity taskEntity = new TaskEntity();
+        task.idOption().ifPresent(taskEntity::setId);
+        taskEntity.setName(task.name());
+        taskEntity.setDescription(task.description());
+        taskEntity.setTargetEnd(task.targetEndOption().orElse(null));
+        taskEntity.setExtraInformation(task.extraInformationOption().orElse(null));
+        taskEntity.setClosed(task.closed());
+        return taskEntity;
     }
 }

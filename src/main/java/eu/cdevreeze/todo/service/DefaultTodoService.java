@@ -18,8 +18,10 @@ package eu.cdevreeze.todo.service;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.todo.entity.AddressEntity;
 import eu.cdevreeze.todo.entity.AppointmentEntity;
 import eu.cdevreeze.todo.entity.TaskEntity;
+import eu.cdevreeze.todo.model.Address;
 import eu.cdevreeze.todo.model.Appointment;
 import eu.cdevreeze.todo.model.Task;
 import jakarta.persistence.EntityGraph;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * Default TodoService implementation.
@@ -80,6 +83,31 @@ public class DefaultTodoService implements TodoService {
         var resultTask = taskEntity.toModel();
         Preconditions.checkArgument(resultTask.idOption().isPresent());
         return resultTask;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ImmutableList<Address> findAllAddresses() {
+        String jpaQuery = "select ad from Address ad";
+
+        return entityManager.createQuery(jpaQuery, AddressEntity.class)
+                .getResultStream()
+                .map(AddressEntity::toModel)
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    @Override
+    @Transactional
+    public Address addAddress(Address address) {
+        Preconditions.checkArgument(address.idOption().isEmpty());
+        AddressEntity addressEntity = AddressEntity.fromModel(address);
+
+        entityManager.persist(addressEntity);
+        entityManager.flush();
+
+        var resultAddress = addressEntity.toModel();
+        Preconditions.checkArgument(resultAddress.idOption().isPresent());
+        return resultAddress;
     }
 
     @Override
@@ -168,5 +196,27 @@ public class DefaultTodoService implements TodoService {
                 .getResultStream()
                 .map(AppointmentEntity::toModel)
                 .collect(ImmutableList.toImmutableList());
+    }
+
+    @Override
+    @Transactional
+    public Appointment addAppointment(Appointment appointment) {
+        Preconditions.checkArgument(appointment.idOption().isEmpty());
+        Preconditions.checkArgument(appointment.addressOption().stream().allMatch(addr -> addr.idOption().isPresent()));
+
+        AppointmentEntity appointmentEntity = AppointmentEntity.fromModel(appointment);
+
+        Optional.ofNullable(appointmentEntity.getAddress())
+                .ifPresent(addr -> {
+                    Preconditions.checkArgument(addr.getId() != null);
+                    entityManager.merge(addr);
+                });
+
+        entityManager.persist(appointmentEntity);
+        entityManager.flush();
+
+        var resultAppointment = appointmentEntity.toModel();
+        Preconditions.checkArgument(resultAppointment.idOption().isPresent());
+        return resultAppointment;
     }
 }

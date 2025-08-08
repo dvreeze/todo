@@ -87,6 +87,20 @@ curl -v \
   -d '{ "name": "mail regelen", "description": "overgaan op nieuwe mail provider", "targetEndOption": "2025-09-01T00:00:00Z", "extraInformationOption": null, "closed": false }' \
   http://localhost:8080/tasks.json
 
+# Adding an address (as JSON)
+curl -v \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{ "addressName": "tandarts", "addressLines": [ "kerkstraat 12" ], "zipCode": "6789ZZ", "city": "Havenstad", "countryCode": "NL" }' \
+  http://localhost:8080/addresses.json
+
+# Adding an appointment (as JSON)
+curl -v \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{ "name": "tandarts-202508", "start": "2025-08-08T16:00:00Z", "end": "2025-08-08T17:00:00Z", "addressOption": { "idOption": 2, "addressName": "tandarts", "addressLines": [ "kerkstraat 12" ], "zipCode": "6789ZZ", "city": "Havenstad", "countryCode": "NL" }, "extraInformationOption": null }' \
+  http://localhost:8080/appointments.json
+
 # When we are ready to stop the application..
 mvn spring-boot:stop
 ```

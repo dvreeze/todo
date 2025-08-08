@@ -144,4 +144,18 @@ public class AddressEntity {
                 countryCode
         );
     }
+
+    public static AddressEntity fromModel(Address address) {
+        AddressEntity addressEntity = new AddressEntity();
+        address.idOption().ifPresent(addressEntity::setId);
+        addressEntity.setAddressName(address.addressName());
+        address.addressLines().stream().findFirst().ifPresent(addressEntity::setAddressLine1);
+        address.addressLines().stream().skip(1).findFirst().ifPresent(addressEntity::setAddressLine2);
+        address.addressLines().stream().skip(2).findFirst().ifPresent(addressEntity::setAddressLine3);
+        address.addressLines().stream().skip(3).findFirst().ifPresent(addressEntity::setAddressLine4);
+        addressEntity.setZipCode(address.zipCode());
+        addressEntity.setCity(address.city());
+        addressEntity.setCountryCode(address.countryCode());
+        return addressEntity;
+    }
 }

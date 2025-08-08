@@ -17,6 +17,7 @@
 package eu.cdevreeze.todo.service;
 
 import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.todo.model.Address;
 import eu.cdevreeze.todo.model.Appointment;
 import eu.cdevreeze.todo.model.Task;
 
@@ -35,6 +36,10 @@ public interface TodoService {
 
     Task addTask(Task task);
 
+    ImmutableList<Address> findAllAddresses();
+
+    Address addAddress(Address address);
+
     ImmutableList<Task> findTasksHavingTargetEndAfter(Instant end);
 
     ImmutableList<Task> findTasksHavingTargetEndBefore(Instant end);
@@ -46,4 +51,6 @@ public interface TodoService {
     ImmutableList<Appointment> findAppointmentsEndingAfter(Instant end);
 
     ImmutableList<Appointment> findAppointmentsEndingBefore(Instant end);
+
+    Appointment addAppointment(Appointment appointment);
 }
