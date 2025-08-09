@@ -115,7 +115,7 @@ public class AppointmentEntity {
         );
     }
 
-    public static AppointmentEntity fromModelIgnoringAssociations(Appointment.NewAppointment appointment) {
+    public static AppointmentEntity newAppointmentIgnoringAssociations(Appointment.NewAppointment appointment) {
         AppointmentEntity appointmentEntity = new AppointmentEntity();
         appointmentEntity.setName(appointment.name());
         appointmentEntity.setStart(appointment.start());

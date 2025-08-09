@@ -213,7 +213,7 @@ public class DefaultTodoService implements TodoService {
         }
 
         AppointmentEntity appointmentEntity =
-                AppointmentEntity.fromModelIgnoringAssociations(appointment);
+                AppointmentEntity.newAppointmentIgnoringAssociations(appointment);
         appointmentEntity.setAddress(address);
 
         entityManager.persist(appointmentEntity);
