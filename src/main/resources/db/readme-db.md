@@ -98,7 +98,7 @@ curl -v \
 curl -v \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
-  -d '{ "name": "tandarts-202508", "start": "2025-08-08T16:00:00Z", "end": "2025-08-08T17:00:00Z", "addressOption": { "idOption": 2, "addressName": "tandarts", "addressLines": [ "kerkstraat 12" ], "zipCode": "6789ZZ", "city": "Havenstad", "countryCode": "NL" }, "extraInformationOption": null }' \
+  -d '{ "name": "tandarts-202508", "start": "2025-08-08T16:00:00Z", "end": "2025-08-08T17:00:00Z", "addressNameOption": "tandarts", "extraInformationOption": null }' \
   http://localhost:8080/appointments.json
 
 # When we are ready to stop the application..

@@ -52,5 +52,5 @@ public interface TodoService {
 
     ImmutableList<Appointment> findAppointmentsEndingBefore(Instant end);
 
-    Appointment addAppointment(Appointment appointment);
+    Appointment addAppointment(Appointment.NewAppointment appointment);
 }

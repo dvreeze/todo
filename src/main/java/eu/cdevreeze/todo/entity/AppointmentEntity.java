@@ -115,15 +115,11 @@ public class AppointmentEntity {
         );
     }
 
-    public static AppointmentEntity fromModel(Appointment appointment) {
+    public static AppointmentEntity fromModelIgnoringAssociations(Appointment.NewAppointment appointment) {
         AppointmentEntity appointmentEntity = new AppointmentEntity();
-        appointment.idOption().ifPresent(appointmentEntity::setId);
         appointmentEntity.setName(appointment.name());
         appointmentEntity.setStart(appointment.start());
         appointmentEntity.setEnd(appointment.end());
-        appointmentEntity.setAddress(
-                appointment.addressOption().map(AddressEntity::fromModel).orElse(null)
-        );
         appointmentEntity.setExtraInformation(appointment.extraInformationOption().orElse(null));
         return appointmentEntity;
     }

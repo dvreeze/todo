@@ -33,4 +33,13 @@ public record Appointment(
         Optional<Address> addressOption,
         Optional<String> extraInformationOption
 ) {
+
+    public record NewAppointment(
+            String name,
+            Instant start,
+            Instant end,
+            Optional<String> addressNameOption,
+            Optional<String> extraInformationOption
+    ) {
+    }
 }

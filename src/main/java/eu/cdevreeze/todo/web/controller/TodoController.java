@@ -82,7 +82,7 @@ public class TodoController {
     }
 
     @PostMapping(value = "/appointments.json", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Appointment addAppointment(@RequestBody Appointment appointment) {
+    public Appointment addAppointment(@RequestBody Appointment.NewAppointment appointment) {
         return todoService.addAppointment(appointment);
     }
 }

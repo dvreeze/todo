@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.Optional;
 
 /**
  * Default TodoService implementation.
@@ -200,17 +199,22 @@ public class DefaultTodoService implements TodoService {
 
     @Override
     @Transactional
-    public Appointment addAppointment(Appointment appointment) {
-        Preconditions.checkArgument(appointment.idOption().isEmpty());
-        Preconditions.checkArgument(appointment.addressOption().stream().allMatch(addr -> addr.idOption().isPresent()));
+    public Appointment addAppointment(Appointment.NewAppointment appointment) {
+        AddressEntity address = null;
 
-        AppointmentEntity appointmentEntity = AppointmentEntity.fromModel(appointment);
+        if (appointment.addressNameOption().isPresent()) {
+            String addressName = appointment.addressNameOption().orElseThrow();
 
-        Optional.ofNullable(appointmentEntity.getAddress())
-                .ifPresent(addr -> {
-                    Preconditions.checkArgument(addr.getId() != null);
-                    entityManager.merge(addr);
-                });
+            String addressQuery = "select addr from Address addr where addr.addressName = :addressName";
+
+            address = entityManager.createQuery(addressQuery, AddressEntity.class)
+                    .setParameter("addressName", addressName)
+                    .getSingleResult();
+        }
+
+        AppointmentEntity appointmentEntity =
+                AppointmentEntity.fromModelIgnoringAssociations(appointment);
+        appointmentEntity.setAddress(address);
 
         entityManager.persist(appointmentEntity);
         entityManager.flush();
