@@ -36,7 +36,7 @@ public class AddressEntity {
     @SequenceGenerator(name = "Address_seq_gen", sequenceName = "Address_seq", allocationSize = 1)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String addressName;
 
     @Column(name = "address_line1")

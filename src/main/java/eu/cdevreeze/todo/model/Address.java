@@ -21,7 +21,8 @@ import com.google.common.collect.ImmutableList;
 import java.util.OptionalLong;
 
 /**
- * Immutable address record.
+ * Immutable address record. The address name must uniquely identify the address.
+ * The ID, if any, is the technical primary key.
  *
  * @author Chris de Vreeze
  */

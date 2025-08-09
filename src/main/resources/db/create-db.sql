@@ -32,3 +32,4 @@ create table Task (
   extra_information VARCHAR(1000),
   closed BOOLEAN NOT NULL DEFAULT FALSE
 );
+alter table Task add constraint uk_name unique (name);
