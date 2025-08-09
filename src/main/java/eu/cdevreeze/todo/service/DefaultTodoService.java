@@ -200,21 +200,20 @@ public class DefaultTodoService implements TodoService {
     @Override
     @Transactional
     public Appointment addAppointment(Appointment.NewAppointment appointment) {
-        AddressEntity address = null;
+        AppointmentEntity appointmentEntity =
+                AppointmentEntity.newAppointmentIgnoringAssociations(appointment);
 
         if (appointment.addressNameOption().isPresent()) {
             String addressName = appointment.addressNameOption().orElseThrow();
 
             String addressQuery = "select addr from Address addr where addr.addressName = :addressName";
 
-            address = entityManager.createQuery(addressQuery, AddressEntity.class)
+            AddressEntity address = entityManager.createQuery(addressQuery, AddressEntity.class)
                     .setParameter("addressName", addressName)
                     .getSingleResult();
-        }
 
-        AppointmentEntity appointmentEntity =
-                AppointmentEntity.newAppointmentIgnoringAssociations(appointment);
-        appointmentEntity.setAddress(address);
+            appointmentEntity.setAddress(address);
+        }
 
         entityManager.persist(appointmentEntity);
         entityManager.flush();
