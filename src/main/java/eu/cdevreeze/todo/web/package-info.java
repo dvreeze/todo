@@ -15,7 +15,8 @@
  */
 
 /**
- * Web layer, using Spring Web MVC.
+ * Web layer, using Spring Web MVC. It is agnostic of the implementation details of the service layer,
+ * but instead uses the service layer through its purely abstract API contract.
  *
  * @author Chris de Vreeze
  */

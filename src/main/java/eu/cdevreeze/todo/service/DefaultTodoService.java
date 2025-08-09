@@ -71,6 +71,30 @@ public class DefaultTodoService implements TodoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public ImmutableList<Task> findTasksHavingTargetEndAfter(Instant end) {
+        String jpaQuery = "select t from Task t where t.targetEnd > :end";
+
+        return entityManager.createQuery(jpaQuery, TaskEntity.class)
+                .setParameter("end", end)
+                .getResultStream()
+                .map(TaskEntity::toModel)
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ImmutableList<Task> findTasksHavingTargetEndBefore(Instant end) {
+        String jpaQuery = "select t from Task t where t.targetEnd < :end";
+
+        return entityManager.createQuery(jpaQuery, TaskEntity.class)
+                .setParameter("end", end)
+                .getResultStream()
+                .map(TaskEntity::toModel)
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    @Override
     @Transactional
     public Task addTask(Task task) {
         Preconditions.checkArgument(task.idOption().isEmpty());
@@ -107,30 +131,6 @@ public class DefaultTodoService implements TodoService {
         var resultAddress = addressEntity.toModel();
         Preconditions.checkArgument(resultAddress.idOption().isPresent());
         return resultAddress;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ImmutableList<Task> findTasksHavingTargetEndAfter(Instant end) {
-        String jpaQuery = "select t from Task t where t.targetEnd > :end";
-
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("end", end)
-                .getResultStream()
-                .map(TaskEntity::toModel)
-                .collect(ImmutableList.toImmutableList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ImmutableList<Task> findTasksHavingTargetEndBefore(Instant end) {
-        String jpaQuery = "select t from Task t where t.targetEnd < :end";
-
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("end", end)
-                .getResultStream()
-                .map(TaskEntity::toModel)
-                .collect(ImmutableList.toImmutableList());
     }
 
     @Override

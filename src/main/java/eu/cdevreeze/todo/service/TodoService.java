@@ -34,15 +34,15 @@ public interface TodoService {
 
     ImmutableList<Task> filterTasks(boolean isClosed);
 
+    ImmutableList<Task> findTasksHavingTargetEndAfter(Instant end);
+
+    ImmutableList<Task> findTasksHavingTargetEndBefore(Instant end);
+
     Task addTask(Task task);
 
     ImmutableList<Address> findAllAddresses();
 
     Address addAddress(Address address);
-
-    ImmutableList<Task> findTasksHavingTargetEndAfter(Instant end);
-
-    ImmutableList<Task> findTasksHavingTargetEndBefore(Instant end);
 
     ImmutableList<Appointment> findAllAppointments();
 
