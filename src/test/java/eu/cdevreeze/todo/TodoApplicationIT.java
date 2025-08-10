@@ -26,12 +26,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration test as sanity check for bootstrapping of the ApplicationContext.
+ * Sanity check for bootstrapping of the entire ApplicationContext as an integration test.
  *
  * @author Chris de Vreeze
  */
 @SpringBootTest
-class TodoApplicationTests {
+class TodoApplicationIT {
 
     @Autowired
     private EntityManager entityManager;

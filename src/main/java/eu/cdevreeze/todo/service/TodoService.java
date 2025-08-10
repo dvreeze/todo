@@ -40,9 +40,13 @@ public interface TodoService {
 
     Task addTask(Task task);
 
+    void deleteAllTasks();
+
     ImmutableList<Address> findAllAddresses();
 
     Address addAddress(Address address);
+
+    void deleteAllAddresses();
 
     ImmutableList<Appointment> findAllAppointments();
 
@@ -53,4 +57,6 @@ public interface TodoService {
     ImmutableList<Appointment> findAppointmentsEndingBefore(Instant end);
 
     Appointment addAppointment(Appointment.NewAppointment appointment);
+
+    void deleteAllAppointments();
 }

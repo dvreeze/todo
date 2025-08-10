@@ -109,6 +109,12 @@ public class DefaultTodoService implements TodoService {
     }
 
     @Override
+    @Transactional
+    public void deleteAllTasks() {
+        entityManager.createQuery("delete from Task t").executeUpdate();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ImmutableList<Address> findAllAddresses() {
         String jpaQuery = "select ad from Address ad";
@@ -131,6 +137,12 @@ public class DefaultTodoService implements TodoService {
         var resultAddress = addressEntity.toModel();
         Preconditions.checkArgument(resultAddress.idOption().isPresent());
         return resultAddress;
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllAddresses() {
+        entityManager.createQuery("delete from Address ad").executeUpdate();
     }
 
     @Override
@@ -221,5 +233,11 @@ public class DefaultTodoService implements TodoService {
         var resultAppointment = appointmentEntity.toModel();
         Preconditions.checkArgument(resultAppointment.idOption().isPresent());
         return resultAppointment;
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllAppointments() {
+        entityManager.createQuery("delete from Appointment ap").executeUpdate();
     }
 }
