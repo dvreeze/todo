@@ -60,11 +60,23 @@ public class DefaultTodoService implements TodoService {
 
     @Override
     @Transactional(readOnly = true)
-    public ImmutableList<Task> filterTasks(boolean isClosed) {
+    public ImmutableList<Task> findAllOpenTasks() {
         String jpaQuery = "select t from Task t where closed = :closed";
 
         return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("closed", isClosed)
+                .setParameter("closed", false)
+                .getResultStream()
+                .map(TaskEntity::toModel)
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ImmutableList<Task> findAllClosedTasks() {
+        String jpaQuery = "select t from Task t where closed = :closed";
+
+        return entityManager.createQuery(jpaQuery, TaskEntity.class)
+                .setParameter("closed", true)
                 .getResultStream()
                 .map(TaskEntity::toModel)
                 .collect(ImmutableList.toImmutableList());

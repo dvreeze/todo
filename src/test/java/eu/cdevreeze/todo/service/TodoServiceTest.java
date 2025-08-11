@@ -111,6 +111,32 @@ class TodoServiceTest {
     }
 
     @Test
+    void shouldReturnAllOpenTasks() {
+        addSomeTasks();
+
+        ImmutableList<Task> tasks = todoService.findAllOpenTasks();
+
+        assertThat(tasks)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(2)
+                .allMatch(task -> Stream.of("opruimen", "stofzuigen").anyMatch(str -> task.name().contains(str)));
+    }
+
+    @Test
+    void shouldReturnAllClosedTasks() {
+        addSomeTasks();
+
+        ImmutableList<Task> tasks = todoService.findAllClosedTasks();
+
+        assertThat(tasks)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(1)
+                .allMatch(task -> Stream.of("opruimen").anyMatch(str -> task.name().contains(str)));
+    }
+
+    @Test
     void shouldAddTask() {
         addSomeTasks();
         int initSize = todoService.findAllTasks().size();
@@ -146,7 +172,7 @@ class TodoServiceTest {
                 "opruimen kamer",
                 Optional.of(now.plus(1, ChronoUnit.DAYS)),
                 Optional.empty(),
-                false
+                true
         ));
         todoService.addTask(new Task(
                 OptionalLong.empty(),

@@ -48,7 +48,11 @@ public class TodoController {
         if (isClosed == null) {
             return todoService.findAllTasks();
         } else {
-            return todoService.filterTasks(isClosed);
+            if (isClosed) {
+                return todoService.findAllClosedTasks();
+            } else {
+                return todoService.findAllOpenTasks();
+            }
         }
     }
 

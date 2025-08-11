@@ -16,6 +16,11 @@
 
 package eu.cdevreeze.todo.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TodoService;
@@ -71,24 +76,62 @@ class TodoControllerTest {
             mockMvc.perform(get("/tasks.json").accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(content().json(expectedTasksJson()));
+                    .andExpect(content().json(expectedTasksJsonString()));
             verify(todoService, times(1)).findAllTasks();
+        }
+
+        @Test
+        void shouldGetAllOpenTasks() throws Exception {
+            // Given
+            when(todoService.findAllOpenTasks()).thenReturn(
+                    testTasks().stream().filter(t -> !t.closed()).collect(ImmutableList.toImmutableList())
+            );
+
+            // When/then
+            mockMvc.perform(get("/tasks.json").param("closed", "false").accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(content().json(expectedOpenTasksJsonString()));
+            verify(todoService, times(1)).findAllOpenTasks();
+        }
+
+        @Test
+        void shouldGetAllClosedTasks() throws Exception {
+            // Given
+            when(todoService.findAllClosedTasks()).thenReturn(
+                    testTasks().stream().filter(Task::closed).collect(ImmutableList.toImmutableList())
+            );
+
+            // When/then
+            mockMvc.perform(get("/tasks.json").param("closed", "true").accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(content().json(expectedClosedTasksJsonString()));
+            verify(todoService, times(1)).findAllClosedTasks();
         }
 
         private ImmutableList<Task> testTasks() {
             return ImmutableList.of(
                     new Task(
                             OptionalLong.of(1),
-                            "opruimen kamer",
-                            "opruimen kamer",
+                            "opruimen kamer (1)",
+                            "opruimen kamer (1)",
+                            Optional.of(now.plus(-100, ChronoUnit.DAYS)),
+                            Optional.empty(),
+                            true
+                    ),
+                    new Task(
+                            OptionalLong.of(2),
+                            "opruimen kamer (2)",
+                            "opruimen kamer (2)",
                             Optional.of(now.plus(1, ChronoUnit.DAYS)),
                             Optional.empty(),
                             false
                     ),
                     new Task(
-                            OptionalLong.of(2),
-                            "stofzuigen kamer",
-                            "stofzuigen kamer",
+                            OptionalLong.of(3),
+                            "stofzuigen kamer (1)",
+                            "stofzuigen kamer (1)",
                             Optional.of(now.plus(2, ChronoUnit.DAYS)),
                             Optional.empty(),
                             false
@@ -96,30 +139,57 @@ class TodoControllerTest {
             );
         }
 
-        private String expectedTasksJson() {
-            return
-                    String.format("""
-                                    [
-                                      {
-                                        "idOption": 1,
-                                        "name": "opruimen kamer",
-                                        "description": "opruimen kamer",
-                                        "targetEndOption": "%s",
-                                        "extraInformationOption": null,
-                                        "closed": false
-                                      },
-                                      {
-                                        "idOption": 2,
-                                        "name": "stofzuigen kamer",
-                                        "description": "stofzuigen kamer",
-                                        "targetEndOption": "%s",
-                                        "extraInformationOption": null,
-                                        "closed": false
-                                      }
-                                    ]
-                                    """,
-                            now.plus(1, ChronoUnit.DAYS),
-                            now.plus(2, ChronoUnit.DAYS));
+        private ArrayNode expectedTasksJsonArray() {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ArrayNode result = objectMapper.createArrayNode();
+
+            ObjectNode task1Json = objectMapper.createObjectNode();
+            task1Json.put("idOption", 1);
+            task1Json.put("name", "opruimen kamer (1)");
+            task1Json.put("description", "opruimen kamer (1)");
+            task1Json.put("targetEndOption", now.plus(-100, ChronoUnit.DAYS).toString());
+            task1Json.putNull("extraInformationOption");
+            task1Json.put("closed", true);
+            result.add(task1Json);
+
+            ObjectNode task2Json = objectMapper.createObjectNode();
+            task2Json.put("idOption", 2);
+            task2Json.put("name", "opruimen kamer (2)");
+            task2Json.put("description", "opruimen kamer (2)");
+            task2Json.put("targetEndOption", now.plus(1, ChronoUnit.DAYS).toString());
+            task2Json.putNull("extraInformationOption");
+            task2Json.put("closed", false);
+            result.add(task2Json);
+
+            ObjectNode task3Json = objectMapper.createObjectNode();
+            task3Json.put("idOption", 3);
+            task3Json.put("name", "stofzuigen kamer (1)");
+            task3Json.put("description", "stofzuigen kamer (1)");
+            task3Json.put("targetEndOption", now.plus(2, ChronoUnit.DAYS).toString());
+            task3Json.putNull("extraInformationOption");
+            task3Json.put("closed", false);
+            result.add(task3Json);
+
+            Preconditions.checkArgument(ImmutableList.copyOf(result.elements()).size() == 3);
+            return result;
+        }
+
+        private String expectedTasksJsonString() {
+            return expectedTasksJsonArray().toPrettyString();
+        }
+
+        private String expectedOpenTasksJsonString() {
+            ArrayNode result = expectedTasksJsonArray().deepCopy();
+            result.removeIf(json -> json.isObject() && json.optional("closed").equals(Optional.of(BooleanNode.TRUE)));
+            Preconditions.checkArgument(ImmutableList.copyOf(result.elements()).size() == 2);
+            return result.toPrettyString();
+        }
+
+        private String expectedClosedTasksJsonString() {
+            ArrayNode result = expectedTasksJsonArray().deepCopy();
+            result.removeIf(json -> json.isObject() && json.optional("closed").equals(Optional.of(BooleanNode.FALSE)));
+            Preconditions.checkArgument(ImmutableList.copyOf(result.elements()).size() == 1);
+            return result.toPrettyString();
         }
     }
 }
