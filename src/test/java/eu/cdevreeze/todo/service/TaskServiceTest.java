@@ -32,14 +32,14 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import javax.sql.DataSource;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit test for the TodoService.
+ * Unit test for the TaskService.
  * <p>
  * See <a href="https://testcontainers.com/guides/testing-spring-boot-rest-api-using-testcontainers/">Spring Boot and Testcontainers</a>
  * for the use of PostgreSQL test containers in Spring Boot tests.
@@ -53,7 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @TestPropertySource("/application-test.properties")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class TodoServiceTest {
+class TaskServiceTest {
 
     // TODO Use SpringExtension (and automatic TX rollback)
 
@@ -61,7 +61,7 @@ class TodoServiceTest {
     static PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:16-alpine");
 
-    private TodoService todoService;
+    private TaskService taskService;
 
     @Autowired
     private DataSource dataSource;
@@ -81,13 +81,13 @@ class TodoServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        this.todoService = new DefaultTodoService(entityManager.getEntityManager());
-        this.todoService.deleteAllTasks(); // Much better: Spring-offered automatic rollback
+        this.taskService = new DefaultTaskService(entityManager.getEntityManager());
+        this.taskService.deleteAllTasks(); // Much better: Spring-offered automatic rollback
     }
 
     @AfterEach
     void afterEach() {
-        this.todoService = null;
+        this.taskService = null;
     }
 
     @DynamicPropertySource
@@ -98,48 +98,97 @@ class TodoServiceTest {
     }
 
     @Test
+    @DisplayName("should return all tasks")
     void shouldReturnAllTasks() {
         addSomeTasks();
 
-        ImmutableList<Task> tasks = todoService.findAllTasks();
+        ImmutableList<Task> tasks = taskService.findAllTasks();
 
         assertThat(tasks)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(3)
-                .allMatch(task -> Stream.of("opruimen", "stofzuigen").anyMatch(str -> task.name().contains(str)));
+                .satisfies(taskList ->
+                        assertThat(taskList).extracting(Task::name)
+                                .isEqualTo(List.of("opruimen kamer", "stofzuigen kamer", "opruimen slaapkamer"))
+                );
     }
 
     @Test
+    @DisplayName("should return all open tasks")
     void shouldReturnAllOpenTasks() {
         addSomeTasks();
 
-        ImmutableList<Task> tasks = todoService.findAllOpenTasks();
+        ImmutableList<Task> tasks = taskService.findAllOpenTasks();
 
         assertThat(tasks)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(2)
-                .allMatch(task -> Stream.of("opruimen", "stofzuigen").anyMatch(str -> task.name().contains(str)));
+                .satisfies(taskList ->
+                        assertThat(taskList).extracting(Task::name)
+                                .isEqualTo(List.of("stofzuigen kamer", "opruimen slaapkamer"))
+                );
     }
 
     @Test
+    @DisplayName("should return all closed tasks")
     void shouldReturnAllClosedTasks() {
         addSomeTasks();
 
-        ImmutableList<Task> tasks = todoService.findAllClosedTasks();
+        ImmutableList<Task> tasks = taskService.findAllClosedTasks();
 
         assertThat(tasks)
                 .isNotNull()
                 .isNotEmpty()
                 .hasSize(1)
-                .allMatch(task -> Stream.of("opruimen").anyMatch(str -> task.name().contains(str)));
+                .satisfies(taskList ->
+                        assertThat(taskList).extracting(Task::name)
+                                .isEqualTo(List.of("opruimen kamer"))
+                );
     }
 
     @Test
+    @DisplayName("should return all tasks having target end after")
+    void shouldReturnTasksHavingTargetEndAfter() {
+        addSomeTasks();
+
+        Instant end = now.plus(1, ChronoUnit.DAYS).plus(12, ChronoUnit.HOURS);
+        ImmutableList<Task> tasks = taskService.findTasksHavingTargetEndAfter(end);
+
+        assertThat(tasks)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(2)
+                .satisfies(taskList ->
+                        assertThat(taskList).extracting(Task::name)
+                                .isEqualTo(List.of("stofzuigen kamer", "opruimen slaapkamer"))
+                );
+    }
+
+    @Test
+    @DisplayName("should return all tasks having target end before")
+    void shouldReturnTasksHavingTargetEndBefore() {
+        addSomeTasks();
+
+        Instant end = now.plus(1, ChronoUnit.DAYS).plus(12, ChronoUnit.HOURS);
+        ImmutableList<Task> tasks = taskService.findTasksHavingTargetEndBefore(end);
+
+        assertThat(tasks)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(1)
+                .satisfies(taskList ->
+                        assertThat(taskList).extracting(Task::name)
+                                .isEqualTo(List.of("opruimen kamer"))
+                );
+    }
+
+    @Test
+    @DisplayName("should add task")
     void shouldAddTask() {
         addSomeTasks();
-        int initSize = todoService.findAllTasks().size();
+        int initSize = taskService.findAllTasks().size();
 
         Task newTask = new Task(
                 OptionalLong.empty(),
@@ -150,7 +199,7 @@ class TodoServiceTest {
                 false
         );
 
-        Task task = todoService.addTask(newTask);
+        Task task = taskService.addTask(newTask);
 
         assertThat(task)
                 .satisfies(t -> {
@@ -161,12 +210,13 @@ class TodoServiceTest {
                     assertThat(t.extraInformationOption()).isEqualTo(newTask.extraInformationOption());
                     assertThat(t.closed()).isEqualTo(newTask.closed());
                 });
-        assertThat(todoService.findAllTasks()).hasSize(initSize + 1);
+        assertThat(taskService.findAllTasks()).hasSize(initSize + 1);
     }
 
+    private final Instant now = Instant.now();
+
     private void addSomeTasks() {
-        Instant now = Instant.now();
-        todoService.addTask(new Task(
+        taskService.addTask(new Task(
                 OptionalLong.empty(),
                 "opruimen kamer",
                 "opruimen kamer",
@@ -174,7 +224,7 @@ class TodoServiceTest {
                 Optional.empty(),
                 true
         ));
-        todoService.addTask(new Task(
+        taskService.addTask(new Task(
                 OptionalLong.empty(),
                 "stofzuigen kamer",
                 "stofzuigen kamer",
@@ -182,7 +232,7 @@ class TodoServiceTest {
                 Optional.empty(),
                 false
         ));
-        todoService.addTask(new Task(
+        taskService.addTask(new Task(
                 OptionalLong.empty(),
                 "opruimen slaapkamer",
                 "opruimen slaapkamer",

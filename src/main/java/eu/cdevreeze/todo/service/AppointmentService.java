@@ -17,38 +17,16 @@
 package eu.cdevreeze.todo.service;
 
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.todo.model.Address;
 import eu.cdevreeze.todo.model.Appointment;
-import eu.cdevreeze.todo.model.Task;
 
 import java.time.Instant;
 
 /**
- * API contract for a to-do service, managing tasks and appointments of the logged-in user.
+ * API contract of a service for querying and managing appointments of the logged-in user.
  *
  * @author Chris de Vreeze
  */
-public interface TodoService {
-
-    ImmutableList<Task> findAllTasks();
-
-    ImmutableList<Task> findAllOpenTasks();
-
-    ImmutableList<Task> findAllClosedTasks();
-
-    ImmutableList<Task> findTasksHavingTargetEndAfter(Instant end);
-
-    ImmutableList<Task> findTasksHavingTargetEndBefore(Instant end);
-
-    Task addTask(Task task);
-
-    void deleteAllTasks();
-
-    ImmutableList<Address> findAllAddresses();
-
-    Address addAddress(Address address);
-
-    void deleteAllAddresses();
+public interface AppointmentService {
 
     ImmutableList<Appointment> findAllAppointments();
 

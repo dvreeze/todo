@@ -23,7 +23,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.model.Task;
-import eu.cdevreeze.todo.service.TodoService;
+import eu.cdevreeze.todo.service.AddressService;
+import eu.cdevreeze.todo.service.AppointmentService;
+import eu.cdevreeze.todo.service.TaskService;
 import eu.cdevreeze.todo.web.controller.TodoController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -59,7 +61,13 @@ class TodoControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private TodoService todoService;
+    private TaskService taskService;
+
+    @MockitoBean
+    private AddressService addressService;
+
+    @MockitoBean
+    private AppointmentService appointmentService;
 
     @Nested
     @DisplayName("GET /tasks.json endpoint tests")
@@ -68,22 +76,24 @@ class TodoControllerTest {
         private final Instant now = Instant.now();
 
         @Test
+        @DisplayName("should get all tasks")
         void shouldGetAllTasks() throws Exception {
             // Given
-            when(todoService.findAllTasks()).thenReturn(testTasks());
+            when(taskService.findAllTasks()).thenReturn(testTasks());
 
             // When/then
             mockMvc.perform(get("/tasks.json").accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(content().json(expectedTasksJsonString()));
-            verify(todoService, times(1)).findAllTasks();
+            verify(taskService, times(1)).findAllTasks();
         }
 
         @Test
+        @DisplayName("should get all open tasks")
         void shouldGetAllOpenTasks() throws Exception {
             // Given
-            when(todoService.findAllOpenTasks()).thenReturn(
+            when(taskService.findAllOpenTasks()).thenReturn(
                     testTasks().stream().filter(t -> !t.closed()).collect(ImmutableList.toImmutableList())
             );
 
@@ -92,13 +102,14 @@ class TodoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(content().json(expectedOpenTasksJsonString()));
-            verify(todoService, times(1)).findAllOpenTasks();
+            verify(taskService, times(1)).findAllOpenTasks();
         }
 
         @Test
+        @DisplayName("should get all closed tasks")
         void shouldGetAllClosedTasks() throws Exception {
             // Given
-            when(todoService.findAllClosedTasks()).thenReturn(
+            when(taskService.findAllClosedTasks()).thenReturn(
                     testTasks().stream().filter(Task::closed).collect(ImmutableList.toImmutableList())
             );
 
@@ -107,7 +118,7 @@ class TodoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(content().json(expectedClosedTasksJsonString()));
-            verify(todoService, times(1)).findAllClosedTasks();
+            verify(taskService, times(1)).findAllClosedTasks();
         }
 
         private ImmutableList<Task> testTasks() {

@@ -20,7 +20,9 @@ import com.google.common.base.Preconditions;
 import eu.cdevreeze.todo.model.Address;
 import eu.cdevreeze.todo.model.Appointment;
 import eu.cdevreeze.todo.model.Task;
-import eu.cdevreeze.todo.service.TodoService;
+import eu.cdevreeze.todo.service.AddressService;
+import eu.cdevreeze.todo.service.AppointmentService;
+import eu.cdevreeze.todo.service.TaskService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,10 +37,18 @@ import java.util.List;
 @RestController
 public class TodoController {
 
-    private final TodoService todoService;
+    private final TaskService taskService;
+    private final AddressService addressService;
+    private final AppointmentService appointmentService;
 
-    public TodoController(TodoService todoService) {
-        this.todoService = todoService;
+    public TodoController(
+            TaskService taskService,
+            AddressService addressService,
+            AppointmentService appointmentService
+    ) {
+        this.taskService = taskService;
+        this.addressService = addressService;
+        this.appointmentService = appointmentService;
     }
 
     @GetMapping(value = "/tasks.json", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -46,29 +56,29 @@ public class TodoController {
             @RequestParam(name = "closed", required = false) Boolean isClosed
     ) {
         if (isClosed == null) {
-            return todoService.findAllTasks();
+            return taskService.findAllTasks();
         } else {
             if (isClosed) {
-                return todoService.findAllClosedTasks();
+                return taskService.findAllClosedTasks();
             } else {
-                return todoService.findAllOpenTasks();
+                return taskService.findAllOpenTasks();
             }
         }
     }
 
     @PostMapping(value = "/tasks.json", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Task addTask(@RequestBody Task task) {
-        return todoService.addTask(task);
+        return taskService.addTask(task);
     }
 
     @GetMapping(value = "/addresses.json", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Address> findAllAddresses() {
-        return todoService.findAllAddresses();
+        return addressService.findAllAddresses();
     }
 
     @PostMapping(value = "/addresses.json", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Address addAddress(@RequestBody Address address) {
-        return todoService.addAddress(address);
+        return addressService.addAddress(address);
     }
 
     @GetMapping(value = "/appointments.json", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -78,15 +88,15 @@ public class TodoController {
     ) {
         if (start == null) {
             Preconditions.checkArgument(end == null);
-            return todoService.findAllAppointments();
+            return appointmentService.findAllAppointments();
         } else {
             Preconditions.checkArgument(end != null);
-            return todoService.findAppointmentsBetween(start, end);
+            return appointmentService.findAppointmentsBetween(start, end);
         }
     }
 
     @PostMapping(value = "/appointments.json", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Appointment addAppointment(@RequestBody Appointment.NewAppointment appointment) {
-        return todoService.addAppointment(appointment);
+        return appointmentService.addAppointment(appointment);
     }
 }

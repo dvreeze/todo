@@ -20,10 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.entity.AddressEntity;
 import eu.cdevreeze.todo.entity.AppointmentEntity;
-import eu.cdevreeze.todo.entity.TaskEntity;
-import eu.cdevreeze.todo.model.Address;
 import eu.cdevreeze.todo.model.Appointment;
-import eu.cdevreeze.todo.model.Task;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
@@ -32,129 +29,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 
 /**
- * Default TodoService implementation.
+ * Default AppointmentService implementation.
  *
  * @author Chris de Vreeze
  */
 @Service
-public class DefaultTodoService implements TodoService {
+public class DefaultAppointmentService implements AppointmentService {
 
     // See https://thorben-janssen.com/hibernate-tips-how-to-bootstrap-hibernate-with-spring-boot/
 
     private final EntityManager entityManager;
 
-    public DefaultTodoService(EntityManager entityManager) {
+    public DefaultAppointmentService(EntityManager entityManager) {
         this.entityManager = entityManager;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ImmutableList<Task> findAllTasks() {
-        String jpaQuery = "select t from Task t";
-
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .getResultStream()
-                .map(TaskEntity::toModel)
-                .collect(ImmutableList.toImmutableList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ImmutableList<Task> findAllOpenTasks() {
-        String jpaQuery = "select t from Task t where closed = :closed";
-
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("closed", false)
-                .getResultStream()
-                .map(TaskEntity::toModel)
-                .collect(ImmutableList.toImmutableList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ImmutableList<Task> findAllClosedTasks() {
-        String jpaQuery = "select t from Task t where closed = :closed";
-
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("closed", true)
-                .getResultStream()
-                .map(TaskEntity::toModel)
-                .collect(ImmutableList.toImmutableList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ImmutableList<Task> findTasksHavingTargetEndAfter(Instant end) {
-        String jpaQuery = "select t from Task t where t.targetEnd > :end";
-
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("end", end)
-                .getResultStream()
-                .map(TaskEntity::toModel)
-                .collect(ImmutableList.toImmutableList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ImmutableList<Task> findTasksHavingTargetEndBefore(Instant end) {
-        String jpaQuery = "select t from Task t where t.targetEnd < :end";
-
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("end", end)
-                .getResultStream()
-                .map(TaskEntity::toModel)
-                .collect(ImmutableList.toImmutableList());
-    }
-
-    @Override
-    @Transactional
-    public Task addTask(Task task) {
-        Preconditions.checkArgument(task.idOption().isEmpty());
-        TaskEntity taskEntity = TaskEntity.fromModel(task);
-
-        entityManager.persist(taskEntity);
-        entityManager.flush();
-
-        var resultTask = taskEntity.toModel();
-        Preconditions.checkArgument(resultTask.idOption().isPresent());
-        return resultTask;
-    }
-
-    @Override
-    @Transactional
-    public void deleteAllTasks() {
-        entityManager.createQuery("delete from Task t").executeUpdate();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ImmutableList<Address> findAllAddresses() {
-        String jpaQuery = "select ad from Address ad";
-
-        return entityManager.createQuery(jpaQuery, AddressEntity.class)
-                .getResultStream()
-                .map(AddressEntity::toModel)
-                .collect(ImmutableList.toImmutableList());
-    }
-
-    @Override
-    @Transactional
-    public Address addAddress(Address address) {
-        Preconditions.checkArgument(address.idOption().isEmpty());
-        AddressEntity addressEntity = AddressEntity.fromModel(address);
-
-        entityManager.persist(addressEntity);
-        entityManager.flush();
-
-        var resultAddress = addressEntity.toModel();
-        Preconditions.checkArgument(resultAddress.idOption().isPresent());
-        return resultAddress;
-    }
-
-    @Override
-    @Transactional
-    public void deleteAllAddresses() {
-        entityManager.createQuery("delete from Address ad").executeUpdate();
     }
 
     @Override

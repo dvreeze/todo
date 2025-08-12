@@ -16,7 +16,9 @@
 
 package eu.cdevreeze.todo;
 
-import eu.cdevreeze.todo.service.TodoService;
+import eu.cdevreeze.todo.service.AddressService;
+import eu.cdevreeze.todo.service.AppointmentService;
+import eu.cdevreeze.todo.service.TaskService;
 import eu.cdevreeze.todo.web.controller.TodoController;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -36,7 +38,11 @@ class TodoApplicationIT {
     @Autowired
     private EntityManager entityManager;
     @Autowired
-    private TodoService todoService;
+    private TaskService taskService;
+    @Autowired
+    private AddressService addressService;
+    @Autowired
+    private AppointmentService appointmentService;
     @Autowired
     private TodoController todoController;
 
@@ -46,8 +52,14 @@ class TodoApplicationIT {
         System.out.printf("EntityManager: %s%n", entityManager.getClass());
         assertThat(entityManager.isOpen()).isTrue();
 
-        assertThat(todoService).isNotNull();
-        System.out.printf("TodoService: %s%n", todoService.getClass());
+        assertThat(taskService).isNotNull();
+        System.out.printf("TaskService: %s%n", taskService.getClass());
+
+        assertThat(addressService).isNotNull();
+        System.out.printf("AddressService: %s%n", addressService.getClass());
+
+        assertThat(appointmentService).isNotNull();
+        System.out.printf("AppointmentService: %s%n", appointmentService.getClass());
 
         assertThat(todoController).isNotNull();
         System.out.printf("TodoController: %s%n", todoController.getClass());
