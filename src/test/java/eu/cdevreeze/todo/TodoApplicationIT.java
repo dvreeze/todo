@@ -25,24 +25,22 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Sanity check for bootstrapping of the entire ApplicationContext as an integration test.
  *
  * @author Chris de Vreeze
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TodoApplicationIT {
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private EntityManager entityManager;
@@ -54,6 +52,9 @@ class TodoApplicationIT {
     private AppointmentService appointmentService;
     @Autowired
     private TodoController todoController;
+
+    @LocalServerPort
+    private int localServerPort;
 
     @Test
     @DisplayName("context loads")
@@ -90,9 +91,17 @@ class TodoApplicationIT {
 
     @Test
     @DisplayName("web layer responds as expected")
-    void webLayerWorks() throws Exception {
-        mockMvc.perform(get("/tasks.json").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    void webLayerWorks() {
+        RestClient restClient = RestClient.create();
+
+        ResponseEntity<String> responseEntity = restClient.get()
+                .uri(String.format("http://localhost:%d/tasks.json", localServerPort))
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve().toEntity(String.class);
+
+        assertThat(responseEntity.getStatusCode())
+                .isEqualTo(HttpStatusCode.valueOf(HttpStatus.OK.value()));
+        assertThat(responseEntity.getBody())
+                .isNotEmpty();
     }
 }
