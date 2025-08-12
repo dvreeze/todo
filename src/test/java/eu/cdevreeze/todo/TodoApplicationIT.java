@@ -21,19 +21,28 @@ import eu.cdevreeze.todo.service.AppointmentService;
 import eu.cdevreeze.todo.service.TaskService;
 import eu.cdevreeze.todo.web.controller.TodoController;
 import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Sanity check for bootstrapping of the entire ApplicationContext as an integration test.
  *
  * @author Chris de Vreeze
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class TodoApplicationIT {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     private EntityManager entityManager;
@@ -47,6 +56,7 @@ class TodoApplicationIT {
     private TodoController todoController;
 
     @Test
+    @DisplayName("context loads")
     void contextLoads() {
         assertThat(entityManager).isNotNull();
         System.out.printf("EntityManager: %s%n", entityManager.getClass());
@@ -63,5 +73,26 @@ class TodoApplicationIT {
 
         assertThat(todoController).isNotNull();
         System.out.printf("TodoController: %s%n", todoController.getClass());
+    }
+
+    @Test
+    @DisplayName("service layer responds as expected")
+    void serviceLayerWorks() {
+        assertThat(taskService.findAllTasks())
+                .isNotEmpty();
+
+        assertThat(addressService.findAllAddresses())
+                .isNotEmpty();
+
+        assertThat(appointmentService.findAllAppointments())
+                .isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("web layer responds as expected")
+    void webLayerWorks() throws Exception {
+        mockMvc.perform(get("/tasks.json").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 }
