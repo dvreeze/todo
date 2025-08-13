@@ -34,19 +34,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.OptionalLong;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Unit test for the TodoController.
@@ -77,47 +79,79 @@ class TodoControllerTest {
 
         @Test
         @DisplayName("should get all tasks")
-        void shouldGetAllTasks() throws Exception {
+        void shouldGetAllTasks() {
+            MockMvcTester mockMvcTester = MockMvcTester.create(mockMvc);
+
             // Given
             when(taskService.findAllTasks()).thenReturn(testTasks());
 
-            // When/then
-            mockMvc.perform(get("/tasks.json").accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(content().json(expectedTasksJsonString()));
+            // When
+            MvcTestResult mvcTestResult = mockMvcTester
+                    .get()
+                    .uri("/tasks.json")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange();
+
+            // Then
+            assertThat(mvcTestResult)
+                    .hasStatus2xxSuccessful()
+                    .hasStatus(HttpStatus.OK)
+                    .hasContentType(MediaType.APPLICATION_JSON)
+                    .matches(content().json(expectedTasksJsonString()));
             verify(taskService, times(1)).findAllTasks();
         }
 
         @Test
         @DisplayName("should get all open tasks")
         void shouldGetAllOpenTasks() throws Exception {
+            MockMvcTester mockMvcTester = MockMvcTester.create(mockMvc);
+
             // Given
             when(taskService.findAllOpenTasks()).thenReturn(
                     testTasks().stream().filter(t -> !t.closed()).collect(ImmutableList.toImmutableList())
             );
 
-            // When/then
-            mockMvc.perform(get("/tasks.json").param("closed", "false").accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(content().json(expectedOpenTasksJsonString()));
+            // When
+            MvcTestResult mvcTestResult = mockMvcTester
+                    .get()
+                    .uri("/tasks.json")
+                    .param("closed", "false")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange();
+
+            // Then
+            assertThat(mvcTestResult)
+                    .hasStatus2xxSuccessful()
+                    .hasStatus(HttpStatus.OK)
+                    .hasContentType(MediaType.APPLICATION_JSON)
+                    .matches(content().json(expectedOpenTasksJsonString()));
             verify(taskService, times(1)).findAllOpenTasks();
         }
 
         @Test
         @DisplayName("should get all closed tasks")
         void shouldGetAllClosedTasks() throws Exception {
+            MockMvcTester mockMvcTester = MockMvcTester.create(mockMvc);
+
             // Given
             when(taskService.findAllClosedTasks()).thenReturn(
                     testTasks().stream().filter(Task::closed).collect(ImmutableList.toImmutableList())
             );
 
-            // When/then
-            mockMvc.perform(get("/tasks.json").param("closed", "true").accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(content().json(expectedClosedTasksJsonString()));
+            // When
+            MvcTestResult mvcTestResult = mockMvcTester
+                    .get()
+                    .uri("/tasks.json")
+                    .param("closed", "true")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange();
+
+            // Then
+            assertThat(mvcTestResult)
+                    .hasStatus2xxSuccessful()
+                    .hasStatus(HttpStatus.OK)
+                    .hasContentType(MediaType.APPLICATION_JSON)
+                    .matches(content().json(expectedClosedTasksJsonString()));
             verify(taskService, times(1)).findAllClosedTasks();
         }
 
