@@ -36,7 +36,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  */
 @DataJpaTest
 @TestPropertySource("/application-test.properties")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NON_TEST)
 public abstract class AbstractServiceTest {
 
     @ServiceConnection
