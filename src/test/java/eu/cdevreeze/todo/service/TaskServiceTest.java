@@ -68,6 +68,8 @@ class TaskServiceTest extends AbstractServiceTest {
     @Test
     @DisplayName("should return all tasks")
     void shouldReturnAllTasks() {
+        System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
+
         addSomeTasks();
 
         ImmutableList<Task> tasks = taskService.findAllTasks();
@@ -85,6 +87,8 @@ class TaskServiceTest extends AbstractServiceTest {
     @Test
     @DisplayName("should return all open tasks")
     void shouldReturnAllOpenTasks() {
+        System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
+
         addSomeTasks();
 
         ImmutableList<Task> tasks = taskService.findAllOpenTasks();
@@ -102,6 +106,8 @@ class TaskServiceTest extends AbstractServiceTest {
     @Test
     @DisplayName("should return all closed tasks")
     void shouldReturnAllClosedTasks() {
+        System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
+
         addSomeTasks();
 
         ImmutableList<Task> tasks = taskService.findAllClosedTasks();
@@ -119,6 +125,8 @@ class TaskServiceTest extends AbstractServiceTest {
     @Test
     @DisplayName("should return all tasks having target end after")
     void shouldReturnTasksHavingTargetEndAfter() {
+        System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
+
         addSomeTasks();
 
         Instant end = now.plus(1, ChronoUnit.DAYS).plus(12, ChronoUnit.HOURS);
@@ -137,6 +145,8 @@ class TaskServiceTest extends AbstractServiceTest {
     @Test
     @DisplayName("should return all tasks having target end before")
     void shouldReturnTasksHavingTargetEndBefore() {
+        System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
+
         addSomeTasks();
 
         Instant end = now.plus(1, ChronoUnit.DAYS).plus(12, ChronoUnit.HOURS);
@@ -155,6 +165,8 @@ class TaskServiceTest extends AbstractServiceTest {
     @Test
     @DisplayName("should add task")
     void shouldAddTask() {
+        System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
+
         addSomeTasks();
         int initSize = taskService.findAllTasks().size();
 
