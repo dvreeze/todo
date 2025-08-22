@@ -26,7 +26,7 @@
  * are model objects as immutable Java records. The latter objects are also technology-agnostic, in
  * contrast to JPA entities.
  * <p>
- * Finally, note that from an API point of view, the functions in the service interfaces are pure
+ * Finally, note that from an API point of view, the "query" functions in the service interfaces are pure
  * functions, taking immutable data arguments and returning immutable data objects as well. Of course,
  * the service implementations do have side effects, but as far as the service API is concerned those
  * are implementation details.
