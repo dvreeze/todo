@@ -15,10 +15,16 @@
  */
 
 /**
- * Service layer, as technology-agnostic Java interfaces, implemented by concrete Java classes.
+ * Service layer, as technology-agnostic Java interfaces, implemented by concrete Java classes
+ * in a sub-package.
  * <p>
  * The concrete implementation classes take care of transaction management, database access
  * (either directly or indirectly), etc.
+ * <p>
+ * The service API in this package is completely technology-agnostic, and can easily be mocked in
+ * unit tests. That is, the service interfaces are purely abstract, and the exchanged data objects
+ * are model objects as immutable Java records. The latter objects are also technology-agnostic, in
+ * contrast to JPA entities.
  *
  * @author Chris de Vreeze
  */

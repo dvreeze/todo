@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.todo.service;
+package eu.cdevreeze.todo.service.impl;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

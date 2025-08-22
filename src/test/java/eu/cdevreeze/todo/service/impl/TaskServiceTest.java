@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.todo.service;
+package eu.cdevreeze.todo.service.impl;
 
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.model.Task;
+import eu.cdevreeze.todo.service.TaskService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

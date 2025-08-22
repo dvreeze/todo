@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.todo.service;
+package eu.cdevreeze.todo.service.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.entity.AddressEntity;
 import eu.cdevreeze.todo.model.Address;
+import eu.cdevreeze.todo.service.AddressService;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
