@@ -10,7 +10,7 @@
 <body>
 <div class="container pt-5">
     <div class="col">
-        <h2>Tasks</h2>
+        <h2 th:text="${title}">Tasks</h2>
         <table class="table table-bordered table-striped table-responsive-sm">
             <thead>
             <tr class="table-info">
@@ -28,7 +28,7 @@
                 <td th:text="${task.name}">name</td>
                 <td th:text="${task.description}">description</td>
                 <td th:text="${task.targetEndOption.isPresent ? task.targetEndOption.orElseThrow : ''}">target end</td>
-                <td th:text="${task.extraInformationOption.isPresent ? task.extraInformationOption.orElseThrow : ''}">extra information</td>
+                <td th:text="${task.extraInformationOption.orElse('')}">extra information</td>
                 <td th:text="${task.closed}">closed</td>
             </tr>
             </tbody>

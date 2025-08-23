@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.todo.web.controller;
 
-import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TaskService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,18 +41,19 @@ public class TaskController {
             @RequestParam(name = "closed", required = false) Boolean isClosed,
             Model model
     ) {
-        ImmutableList<Task> tasks;
         if (isClosed == null) {
-            tasks = taskService.findAllTasks();
+            model.addAttribute("tasks", taskService.findAllTasks());
+            model.addAttribute("title", "Tasks");
         } else {
             if (isClosed) {
-                tasks = taskService.findAllClosedTasks();
+                model.addAttribute("tasks", taskService.findAllClosedTasks());
+                model.addAttribute("title", "Closed tasks");
             } else {
-                tasks = taskService.findAllOpenTasks();
+                model.addAttribute("tasks", taskService.findAllOpenTasks());
+                model.addAttribute("title", "Open tasks");
             }
         }
 
-        model.addAttribute("tasks", tasks);
         return "tasks";
     }
 }
