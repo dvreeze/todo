@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * Default TaskService implementation.
@@ -103,6 +104,18 @@ public class DefaultTaskService implements TaskService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<Task> findTask(long id) {
+        String jpaQuery = "select t from Task t where t.id = :id";
+
+        return entityManager.createQuery(jpaQuery, TaskEntity.class)
+                .setParameter("id", id)
+                .getResultStream()
+                .map(TaskEntity::toModel)
+                .findFirst();
+    }
+
+    @Override
     @Transactional
     public Task addTask(Task task) {
         Preconditions.checkArgument(task.idOption().isEmpty());
@@ -114,6 +127,25 @@ public class DefaultTaskService implements TaskService {
         var resultTask = taskEntity.toModel();
         Preconditions.checkArgument(resultTask.idOption().isPresent());
         return resultTask;
+    }
+
+    @Override
+    @Transactional
+    public Task updateTask(Task task) {
+        Preconditions.checkArgument(task.idOption().isPresent());
+
+        TaskEntity taskEntity = entityManager.find(TaskEntity.class, task.idOption().orElseThrow());
+        Preconditions.checkArgument(taskEntity.getName().equals(task.name()));
+
+        taskEntity.setDescription(task.description());
+        taskEntity.setTargetEnd(task.targetEndOption().orElse(null));
+        taskEntity.setExtraInformation(task.extraInformationOption().orElse(null));
+        taskEntity.setClosed(task.closed());
+
+        entityManager.merge(taskEntity);
+        entityManager.flush();
+
+        return taskEntity.toModel();
     }
 
     @Override

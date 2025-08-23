@@ -73,7 +73,8 @@ class TaskControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(view().name("tasks"))
                     .andExpect(model().attribute("tasks", expectedTasks))
-                    .andExpect(model().attribute("title", "Tasks"));
+                    .andExpect(model().attribute("title", "Tasks"))
+                    .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
             verify(taskService, times(1)).findAllTasks();
         }
 
@@ -90,7 +91,8 @@ class TaskControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(view().name("tasks"))
                     .andExpect(model().attribute("tasks", expectedTasks))
-                    .andExpect(model().attribute("title", "Open tasks"));
+                    .andExpect(model().attribute("title", "Open tasks"))
+                    .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
             verify(taskService, times(1)).findAllOpenTasks();
         }
 
@@ -107,7 +109,8 @@ class TaskControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(view().name("tasks"))
                     .andExpect(model().attribute("tasks", expectedTasks))
-                    .andExpect(model().attribute("title", "Closed tasks"));
+                    .andExpect(model().attribute("title", "Closed tasks"))
+                    .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
             verify(taskService, times(1)).findAllClosedTasks();
         }
 

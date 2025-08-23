@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.model.Task;
 
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * API contract of a service for querying and managing tasks of the logged-in user.
@@ -38,7 +39,14 @@ public interface TaskService {
 
     ImmutableList<Task> findTasksHavingTargetEndBefore(Instant end);
 
+    Optional<Task> findTask(long id);
+
     Task addTask(Task task);
+
+    /**
+     * Updates a task. The task must already have an ID. Neither ID nor name can be updated.
+     */
+    Task updateTask(Task task);
 
     void deleteAllTasks();
 }

@@ -16,7 +16,9 @@
 
 package eu.cdevreeze.todo.service.impl;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.todo.entity.TaskEntity;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TaskService;
 import org.junit.jupiter.api.AfterEach;
@@ -58,7 +60,8 @@ class TaskServiceTest extends AbstractServiceTest {
     @BeforeEach
     void beforeEach() {
         this.taskService = new DefaultTaskService(entityManager.getEntityManager());
-        this.taskService.deleteAllTasks(); // Much better: Spring-offered automatic rollback
+        this.entityManager.clear(); // Much better: Spring-offered automatic rollback
+        this.entityManager.flush();
     }
 
     @AfterEach
@@ -164,12 +167,40 @@ class TaskServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @DisplayName("should return a task with the given ID")
+    void shouldReturnTaskByPrimaryKey() {
+        System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
+
+        List<Task> addedTasks = addSomeTasks();
+        Preconditions.checkArgument(addedTasks.size() >= 3);
+        Task selectedTask = addedTasks.get(1);
+        Preconditions.checkArgument(selectedTask.name().equals("stofzuigen kamer"));
+
+        Optional<Task> taskOption = taskService.findTask(selectedTask.idOption().orElseThrow());
+
+        assertThat(taskOption)
+                .isNotNull()
+                .isNotEmpty()
+                .get()
+                .satisfies(task -> {
+                    assertThat(task.idOption()).isEqualTo(selectedTask.idOption());
+                    assertThat(task.name()).isEqualTo(selectedTask.name());
+                    assertThat(task.description()).isEqualTo(selectedTask.description());
+                    assertThat(task.targetEndOption()).isEqualTo(selectedTask.targetEndOption());
+                    assertThat(task.extraInformationOption()).isEqualTo(selectedTask.extraInformationOption());
+                    assertThat(task.closed()).isEqualTo(selectedTask.closed());
+
+                    assertThat(task).isEqualTo(selectedTask);
+                });
+    }
+
+    @Test
     @DisplayName("should add task")
     void shouldAddTask() {
         System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
 
-        addSomeTasks();
-        int initSize = taskService.findAllTasks().size();
+        List<Task> addedTasks = addSomeTasks();
+        int initSize = addedTasks.size();
 
         Task newTask = new Task(
                 OptionalLong.empty(),
@@ -191,35 +222,87 @@ class TaskServiceTest extends AbstractServiceTest {
                     assertThat(t.extraInformationOption()).isEqualTo(newTask.extraInformationOption());
                     assertThat(t.closed()).isEqualTo(newTask.closed());
                 });
-        assertThat(taskService.findAllTasks()).hasSize(initSize + 1);
+        assertThat(
+                entityManager.getEntityManager().createQuery("select t from Task t").getResultList()
+        ).hasSize(initSize + 1);
+    }
+
+    @Test
+    @DisplayName("should update task")
+    void shouldUpdateTask() {
+        System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
+
+        List<Task> addedTasks = addSomeTasks();
+        int initSize = addedTasks.size();
+        Preconditions.checkArgument(initSize >= 3);
+
+        Task taskToUpdate = addedTasks.stream().filter(t -> t.name().equals("stofzuigen kamer")).findFirst().orElseThrow();
+
+        Task taskUpdate = new Task(
+                taskToUpdate.idOption(),
+                taskToUpdate.name(),
+                taskToUpdate.description(),
+                taskToUpdate.targetEndOption(),
+                Optional.of("de slaapkamers zijn ook meegenomen bij het stofzuigen"),
+                true
+        );
+
+        Task task = taskService.updateTask(taskUpdate);
+
+        assertThat(task)
+                .satisfies(t -> {
+                    assertThat(t.idOption()).isEqualTo(taskToUpdate.idOption());
+                    assertThat(t.name()).isEqualTo(taskToUpdate.name());
+                    assertThat(t.description()).isEqualTo(taskToUpdate.description());
+                    assertThat(t.targetEndOption()).isEqualTo(taskToUpdate.targetEndOption());
+                    assertThat(t.extraInformationOption()).isEqualTo(Optional.of("de slaapkamers zijn ook meegenomen bij het stofzuigen"));
+                    assertThat(t.closed()).isEqualTo(true);
+                });
+        assertThat(
+                entityManager.getEntityManager().createQuery("select t from Task t").getResultList()
+        ).hasSize(initSize);
     }
 
     private final Instant now = Instant.now();
 
-    private void addSomeTasks() {
-        taskService.addTask(new Task(
-                OptionalLong.empty(),
-                "opruimen kamer",
-                "opruimen kamer",
-                Optional.of(now.plus(1, ChronoUnit.DAYS)),
-                Optional.empty(),
-                true
-        ));
-        taskService.addTask(new Task(
-                OptionalLong.empty(),
-                "stofzuigen kamer",
-                "stofzuigen kamer",
-                Optional.of(now.plus(2, ChronoUnit.DAYS)),
-                Optional.empty(),
-                false
-        ));
-        taskService.addTask(new Task(
-                OptionalLong.empty(),
-                "opruimen slaapkamer",
-                "opruimen slaapkamer",
-                Optional.of(now.plus(7, ChronoUnit.DAYS)),
-                Optional.empty(),
-                false
-        ));
+    private List<Task> addSomeTasks() {
+        return List.of(
+                entityManager.persistFlushFind(
+                        TaskEntity.fromModel(
+                                new Task(
+                                        OptionalLong.empty(),
+                                        "opruimen kamer",
+                                        "opruimen kamer",
+                                        Optional.of(now.plus(1, ChronoUnit.DAYS)),
+                                        Optional.empty(),
+                                        true
+                                )
+                        )
+                ).toModel(),
+                entityManager.persistFlushFind(
+                        TaskEntity.fromModel(
+                                new Task(
+                                        OptionalLong.empty(),
+                                        "stofzuigen kamer",
+                                        "stofzuigen kamer",
+                                        Optional.of(now.plus(2, ChronoUnit.DAYS)),
+                                        Optional.empty(),
+                                        false
+                                )
+                        )
+                ).toModel(),
+                entityManager.persistFlushFind(
+                        TaskEntity.fromModel(
+                                new Task(
+                                        OptionalLong.empty(),
+                                        "opruimen slaapkamer",
+                                        "opruimen slaapkamer",
+                                        Optional.of(now.plus(7, ChronoUnit.DAYS)),
+                                        Optional.empty(),
+                                        false
+                                )
+                        )
+                ).toModel()
+        );
     }
 }
