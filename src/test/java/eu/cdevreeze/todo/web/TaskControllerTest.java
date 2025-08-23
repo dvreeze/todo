@@ -31,13 +31,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.OptionalLong;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -49,6 +50,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class TaskControllerTest {
 
+    private final static Instant now = Instant.now();
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -58,8 +61,6 @@ class TaskControllerTest {
     @Nested
     @DisplayName("GET /tasks endpoint tests")
     class GetTasksTest {
-
-        private final Instant now = Instant.now();
 
         @Test
         @DisplayName("should get all tasks")
@@ -113,34 +114,74 @@ class TaskControllerTest {
                     .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
             verify(taskService, times(1)).findAllClosedTasks();
         }
+    }
 
-        private ImmutableList<Task> testTasks() {
-            return ImmutableList.of(
-                    new Task(
-                            OptionalLong.of(1),
-                            "opruimen kamer (1)",
-                            "opruimen kamer (1)",
-                            Optional.of(now.plus(-100, ChronoUnit.DAYS)),
-                            Optional.empty(),
-                            true
-                    ),
-                    new Task(
-                            OptionalLong.of(2),
-                            "opruimen kamer (2)",
-                            "opruimen kamer (2)",
-                            Optional.of(now.plus(1, ChronoUnit.DAYS)),
-                            Optional.empty(),
-                            false
-                    ),
-                    new Task(
-                            OptionalLong.of(3),
-                            "stofzuigen kamer (1)",
-                            "stofzuigen kamer (1)",
-                            Optional.of(now.plus(2, ChronoUnit.DAYS)),
-                            Optional.empty(),
-                            false
-                    )
+    @Nested
+    @DisplayName("POST /tasks endpoint tests")
+    class PostTasksTest {
+
+        @Test
+        @DisplayName("should add a new task")
+        void shouldAddTask() throws Exception {
+            // Given
+            LocalDateTime localDateTime = LocalDateTime.of(
+                    LocalDate.of(2025, 9, 30),
+                    LocalTime.of(0, 0, 0, 0)
             );
+            Instant expectedInstant = localDateTime.toInstant(ZoneOffset.UTC);
+
+            Task expectedTask = new Task(
+                    OptionalLong.of(11),
+                    "krant opzeggen",
+                    "krant opzeggen",
+                    Optional.of(expectedInstant),
+                    Optional.empty(),
+                    false
+            );
+            when(taskService.addTask(any(Task.class))).thenReturn(expectedTask);
+
+            // When/then
+            mockMvc.perform(
+                            post("/tasks")
+                                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                    .param("name", "krant opzeggen")
+                                    .param("description", "krant opzeggen")
+                                    .param("targetEnd", localDateTime.toString())
+                                    .param("extraInformation", "")
+                                    .param("closed", "false")
+                    )
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(view().name("redirect:/tasks"));
+            verify(taskService, times(1)).addTask(any(Task.class));
         }
+    }
+
+    private ImmutableList<Task> testTasks() {
+        return ImmutableList.of(
+                new Task(
+                        OptionalLong.of(1),
+                        "opruimen kamer (1)",
+                        "opruimen kamer (1)",
+                        Optional.of(now.plus(-100, ChronoUnit.DAYS)),
+                        Optional.empty(),
+                        true
+                ),
+                new Task(
+                        OptionalLong.of(2),
+                        "opruimen kamer (2)",
+                        "opruimen kamer (2)",
+                        Optional.of(now.plus(1, ChronoUnit.DAYS)),
+                        Optional.empty(),
+                        false
+                ),
+                new Task(
+                        OptionalLong.of(3),
+                        "stofzuigen kamer (1)",
+                        "stofzuigen kamer (1)",
+                        Optional.of(now.plus(2, ChronoUnit.DAYS)),
+                        Optional.empty(),
+                        false
+                )
+        );
     }
 }

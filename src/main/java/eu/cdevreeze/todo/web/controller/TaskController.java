@@ -16,11 +16,18 @@
 
 package eu.cdevreeze.todo.web.controller;
 
+import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TaskService;
+import eu.cdevreeze.todo.web.formdata.TaskFormData;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.ZoneOffset;
+import java.util.Optional;
 
 /**
  * Web MVC controller for tasks.
@@ -54,6 +61,24 @@ public class TaskController {
             }
         }
 
+        model.addAttribute("newTask", new TaskFormData());
+
         return "tasks";
+    }
+
+    @PostMapping(value = "/tasks")
+    public String addTask(@ModelAttribute TaskFormData taskFormData) {
+        Task task = Task.newTask(
+                taskFormData.getName(),
+                taskFormData.getDescription(),
+                Optional.of(taskFormData.getTargetEnd())
+                        .map(dt -> dt.toInstant(ZoneOffset.UTC)),
+                taskFormData.getExtraInformation().isBlank() ? Optional.empty() : Optional.of(taskFormData.getExtraInformation()),
+                taskFormData.isClosed()
+        );
+
+        taskService.addTask(task);
+
+        return "redirect:/tasks";
     }
 }
