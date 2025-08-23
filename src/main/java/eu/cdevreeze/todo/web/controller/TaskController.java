@@ -71,7 +71,7 @@ public class TaskController {
         Task task = Task.newTask(
                 taskFormData.getName(),
                 taskFormData.getDescription(),
-                Optional.of(taskFormData.getTargetEnd())
+                Optional.ofNullable(taskFormData.getTargetEnd())
                         .map(dt -> dt.toInstant(ZoneOffset.UTC)),
                 taskFormData.getExtraInformation().isBlank() ? Optional.empty() : Optional.of(taskFormData.getExtraInformation()),
                 taskFormData.isClosed()
