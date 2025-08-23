@@ -31,7 +31,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -124,10 +127,7 @@ class TaskControllerTest {
         @DisplayName("should add a new task")
         void shouldAddTask() throws Exception {
             // Given
-            LocalDateTime localDateTime = LocalDateTime.of(
-                    LocalDate.of(2025, 9, 30),
-                    LocalTime.of(0, 0, 0, 0)
-            );
+            LocalDateTime localDateTime = LocalDate.of(2025, 9, 30).atStartOfDay();
             Instant expectedInstant = localDateTime.toInstant(ZoneOffset.UTC);
 
             Task expectedTask = new Task(
