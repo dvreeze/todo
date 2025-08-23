@@ -26,7 +26,7 @@ import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.AddressService;
 import eu.cdevreeze.todo.service.AppointmentService;
 import eu.cdevreeze.todo.service.TaskService;
-import eu.cdevreeze.todo.web.controller.TodoController;
+import eu.cdevreeze.todo.web.controller.TodoRestController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -51,13 +51,13 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 /**
- * Unit test for the TodoController.
+ * Unit test for the TodoRestController.
  *
  * @author Chris de Vreeze
  */
-@WebMvcTest(TodoController.class)
+@WebMvcTest(TodoRestController.class)
 @ExtendWith(MockitoExtension.class)
-class TodoControllerTest {
+class TodoRestControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

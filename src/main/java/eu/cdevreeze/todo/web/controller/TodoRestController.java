@@ -35,13 +35,13 @@ import java.util.List;
  * @author Chris de Vreeze
  */
 @RestController
-public class TodoController {
+public class TodoRestController {
 
     private final TaskService taskService;
     private final AddressService addressService;
     private final AppointmentService appointmentService;
 
-    public TodoController(
+    public TodoRestController(
             TaskService taskService,
             AddressService addressService,
             AppointmentService appointmentService

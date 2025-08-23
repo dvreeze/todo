@@ -19,7 +19,7 @@ package eu.cdevreeze.todo;
 import eu.cdevreeze.todo.service.AddressService;
 import eu.cdevreeze.todo.service.AppointmentService;
 import eu.cdevreeze.todo.service.TaskService;
-import eu.cdevreeze.todo.web.controller.TodoController;
+import eu.cdevreeze.todo.web.controller.TodoRestController;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +51,7 @@ class TodoApplicationIT {
     @Autowired
     private AppointmentService appointmentService;
     @Autowired
-    private TodoController todoController;
+    private TodoRestController todoRestController;
 
     @LocalServerPort
     private int localServerPort;
@@ -72,8 +72,8 @@ class TodoApplicationIT {
         assertThat(appointmentService).isNotNull();
         System.out.printf("AppointmentService: %s%n", appointmentService.getClass());
 
-        assertThat(todoController).isNotNull();
-        System.out.printf("TodoController: %s%n", todoController.getClass());
+        assertThat(todoRestController).isNotNull();
+        System.out.printf("TodoRestController: %s%n", todoRestController.getClass());
     }
 
     @Test
