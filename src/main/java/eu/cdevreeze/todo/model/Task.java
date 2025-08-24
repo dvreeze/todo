@@ -34,6 +34,10 @@ public record Task(
         boolean closed
 ) {
 
+    public Task withoutId() {
+        return newTask(name(), description(), targetEndOption(), extraInformationOption(), closed());
+    }
+
     public static Task newTask(
             String name,
             String description,

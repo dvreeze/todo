@@ -26,9 +26,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.ZoneOffset;
-import java.util.Optional;
-
 /**
  * Web MVC controller for tasks.
  *
@@ -73,16 +70,29 @@ public class TaskController {
 
     @PostMapping(value = "/newTask")
     public String addTask(@ModelAttribute TaskFormData taskFormData) {
-        Task task = Task.newTask(
-                taskFormData.getName(),
-                taskFormData.getDescription(),
-                Optional.ofNullable(taskFormData.getTargetEnd())
-                        .map(dt -> dt.toInstant(ZoneOffset.UTC)),
-                taskFormData.getExtraInformation().isBlank() ? Optional.empty() : Optional.of(taskFormData.getExtraInformation()),
-                taskFormData.isClosed()
-        );
+        Task task = taskFormData.toModel().withoutId();
 
         taskService.addTask(task);
+
+        return "redirect:/tasks";
+    }
+
+    @GetMapping(value = "/updateTask")
+    public String getFormToUpdateTask(@RequestParam(name = "id") Long id, Model model) {
+        Task task = taskService.findTask(id).orElseThrow();
+
+        TaskFormData formData = TaskFormData.fromModel(task);
+
+        model.addAttribute("task", formData);
+
+        return "updateTask";
+    }
+
+    @PostMapping(value = "/updateTask")
+    public String updateTask(@ModelAttribute TaskFormData taskFormData) {
+        Task task = taskFormData.toModel();
+
+        taskService.updateTask(task);
 
         return "redirect:/tasks";
     }

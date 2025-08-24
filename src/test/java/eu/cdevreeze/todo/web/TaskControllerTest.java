@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.todo.web;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TaskService;
@@ -132,7 +133,7 @@ class TaskControllerTest {
                     .andExpect(view().name("newTask"))
                     .andExpect(model().attributeExists("newTask"))
                     .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
-            verify(taskService, times(0)).addTask(any(Task.class));
+            verifyNoInteractions(taskService);
         }
     }
 
@@ -164,12 +165,76 @@ class TaskControllerTest {
                                     .param("name", "krant opzeggen")
                                     .param("description", "krant opzeggen")
                                     .param("targetEnd", localDateTime.toString())
-                                    .param("extraInformation", "")
-                                    .param("closed", "false")
                     )
                     .andExpect(status().is3xxRedirection())
                     .andExpect(view().name("redirect:/tasks"));
-            verify(taskService, times(1)).addTask(any(Task.class));
+            verify(taskService, times(1)).addTask(eq(expectedTask.withoutId()));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /updateTask endpoint tests")
+    class GetUpdateTaskFormTest {
+
+        @Test
+        @DisplayName("should get a form to update an existing task")
+        void shouldGetUpdateTaskForm() throws Exception {
+            // Given
+            long taskId = 2;
+            Task expectedOldTask = testTasks().get(1);
+            Preconditions.checkArgument(expectedOldTask.idOption().equals(OptionalLong.of(taskId)));
+            when(taskService.findTask(taskId)).thenReturn(Optional.of(expectedOldTask));
+
+            // When/then
+            mockMvc.perform(get("/updateTask").param("id", String.valueOf(taskId)).accept(MediaType.TEXT_HTML))
+                    .andExpect(status().isOk())
+                    .andExpect(view().name("updateTask"))
+                    .andExpect(model().attributeExists("task"))
+                    .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
+            verify(taskService, times(1)).findTask(taskId);
+            verify(taskService, never()).updateTask(any(Task.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /updateTask endpoint tests")
+    class PostUpdateTaskTest {
+
+        @Test
+        @DisplayName("should update an existing task")
+        void shouldUpdateTask() throws Exception {
+            // Given
+            long taskId = 2;
+            Task expectedOldTask = testTasks().get(1);
+            Preconditions.checkArgument(expectedOldTask.idOption().equals(OptionalLong.of(taskId)));
+
+            LocalDateTime localDateTime = LocalDate.of(2025, 9, 30).atStartOfDay();
+            Instant expectedInstant = localDateTime.toInstant(ZoneOffset.UTC);
+
+            Task expectedNewTask = new Task(
+                    expectedOldTask.idOption(),
+                    expectedOldTask.name(),
+                    expectedOldTask.description(),
+                    Optional.of(expectedInstant),
+                    Optional.of("Ruim op tijd gedaan"),
+                    true
+            );
+            when(taskService.updateTask(expectedNewTask)).thenReturn(expectedNewTask);
+
+            // When/then
+            mockMvc.perform(
+                            post("/updateTask")
+                                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                    .param("id", String.valueOf(taskId))
+                                    .param("name", "opruimen kamer (2)")
+                                    .param("description", "opruimen kamer (2)")
+                                    .param("targetEnd", localDateTime.toString())
+                                    .param("extraInformation", "Ruim op tijd gedaan")
+                                    .param("closed", "true")
+                    )
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(view().name("redirect:/tasks"));
+            verify(taskService, times(1)).updateTask(eq(expectedNewTask));
         }
     }
 

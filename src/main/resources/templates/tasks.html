@@ -35,7 +35,8 @@
                 </thead>
                 <tbody>
                 <tr th:each="task : ${tasks}">
-                    <td th:text="${task.idOption.isPresent ? task.idOption.orElseThrow : ''}">id</td>
+                    <td><a th:href="@{'/updateTask?id=' + ${task.idOption.orElseThrow}}"><span
+                            th:text="${task.idOption.orElseThrow}">id</span></a></td>
                     <td th:text="${task.name}">name</td>
                     <td th:text="${task.description}">description</td>
                     <td th:text="${task.targetEndOption.isPresent ? task.targetEndOption.orElseThrow : ''}">target end

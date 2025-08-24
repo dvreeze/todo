@@ -16,7 +16,12 @@
 
 package eu.cdevreeze.todo.web.formdata;
 
+import eu.cdevreeze.todo.model.Task;
+
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
+import java.util.Optional;
 
 /**
  * Task form data.
@@ -78,5 +83,32 @@ public class TaskFormData {
 
     public void setClosed(boolean closed) {
         this.closed = closed;
+    }
+
+    public Task toModel() {
+        return new Task(
+                Optional.ofNullable(this.getId()).stream().mapToLong(id -> id).findFirst(),
+                Optional.ofNullable(this.getName()).orElseThrow(),
+                Optional.ofNullable(this.getDescription()).orElseThrow(),
+                Optional.ofNullable(this.getTargetEnd())
+                        .map(dt -> dt.toInstant(ZoneOffset.UTC).with(ChronoField.NANO_OF_SECOND, 0)),
+                Optional.ofNullable(this.getExtraInformation()).filter(v -> !v.isBlank()),
+                this.isClosed()
+        );
+    }
+
+    public static TaskFormData fromModel(Task task) {
+        TaskFormData formData = new TaskFormData();
+        formData.setId(task.idOption().stream().boxed().findFirst().orElse(null));
+        formData.setName(task.name());
+        formData.setDescription(task.description());
+        formData.setTargetEnd(
+                task.targetEndOption()
+                        .map(instant -> LocalDateTime.ofInstant(instant.with(ChronoField.NANO_OF_SECOND, 0), ZoneOffset.UTC))
+                        .orElse(null)
+        );
+        formData.setExtraInformation(task.extraInformationOption().orElse(null));
+        formData.setClosed(task.closed());
+        return formData;
     }
 }

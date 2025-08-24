@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tasks</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<!-- For the Bootstrap Grid System, see https://getbootstrap.com/docs/5.2/layout/grid/ -->
+<body>
+<div class="container pt-5">
+    <div class="row gx-5">
+        <nav class="col-2">
+            <h4>Navigation</h4>
+            <menu>
+                <li><a th:href="@{/newTask}">Add task ...</a></li>
+                <li><a th:href="@{/tasks}">Get all tasks</a></li>
+                <li><a th:href="@{/tasks?closed=false}">Get all open tasks</a></li>
+                <li><a th:href="@{/tasks?closed=true}">Get all closed tasks</a></li>
+            </menu>
+        </nav>
+        <div class="col-4">
+            <h2>Update existing task</h2>
+            <!-- See https://www.baeldung.com/thymeleaf-in-spring-mvc -->
+            <!-- See https://getbootstrap.com/docs/5.1/layout/grid/ for a grid-based form layout -->
+            <form action="#" th:action="@{/updateTask}" th:object="${task}" method="post">
+                <!-- Nested row -->
+                <div class="row row-cols-2 gx-5 gy-2">
+                    <div class="col">
+                        <label for="id">ID:</label>
+                    </div>
+                    <div class="col">
+                        <input type="text" id="id" name="id>" th:field="*{id}" readonly/>
+                    </div>
+                    <div class="col">
+                        <label for="name">Name:</label>
+                    </div>
+                    <div class="col">
+                        <input type="text" id="name" name="name>" th:field="*{name}" readonly/>
+                    </div>
+                    <div class="col">
+                        <label for="description">Description:</label>
+                    </div>
+                    <div class="col">
+                        <input type="text" id="description" name="description" th:field="*{description}" required/>
+                    </div>
+                    <div class="col">
+                        <label for="targetEnd">Target end (UTC):</label>
+                    </div>
+                    <div class="col">
+                        <input type="datetime-local" id="targetEnd" name="targetEnd" th:field="*{targetEnd}"/>
+                    </div>
+                    <div class="col">
+                        <label for="extraInformation">Extra information:</label>
+                    </div>
+                    <div class="col">
+                        <input type="text" id="extraInformation" name="extraInformation"
+                               th:field="*{extraInformation}"/>
+                    </div>
+                    <div class="col">
+                        <label for="closed">Closed:</label>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" id="closed" name="closed" th:field="*{closed}"/>
+                    </div>
+                    <div class="col gy-5">
+                        <input type="submit" value="Save" class="save-button">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+-->
+</body>
+</html>
