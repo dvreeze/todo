@@ -20,6 +20,7 @@ import eu.cdevreeze.todo.model.Task;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.Optional;
 
@@ -29,6 +30,8 @@ import java.util.Optional;
  * @author Chris de Vreeze
  */
 public class TaskFormData {
+
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     private Long id;
     private String name;
@@ -67,6 +70,25 @@ public class TaskFormData {
 
     public void setTargetEnd(LocalDateTime targetEnd) {
         this.targetEnd = targetEnd;
+    }
+
+    // Inspired by https://blog.devatlant.com/blog/2018/02/25/how-to-fix-datetime-local-input-in-chrome/
+    // Used for HTML input element of type datetime-local
+
+    public String getFormattedTargetEnd() {
+        if (targetEnd == null) {
+            return null;
+        } else {
+            return dateTimeFormatter.format(targetEnd);
+        }
+    }
+
+    public void setFormattedTargetEnd(String formattedTargetEnd) {
+        if (formattedTargetEnd == null) {
+            setTargetEnd(null);
+        } else {
+            setTargetEnd(LocalDateTime.parse(formattedTargetEnd, dateTimeFormatter));
+        }
     }
 
     public String getExtraInformation() {
