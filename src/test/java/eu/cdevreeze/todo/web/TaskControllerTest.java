@@ -120,8 +120,25 @@ class TaskControllerTest {
     }
 
     @Nested
-    @DisplayName("POST /tasks endpoint tests")
-    class PostTasksTest {
+    @DisplayName("GET /newTask endpoint tests")
+    class GetNewTaskFormTest {
+
+        @Test
+        @DisplayName("should get an empty form to add a new task")
+        void shouldGetNewTaskForm() throws Exception {
+            // When/then
+            mockMvc.perform(get("/newTask").accept(MediaType.TEXT_HTML))
+                    .andExpect(status().isOk())
+                    .andExpect(view().name("newTask"))
+                    .andExpect(model().attributeExists("newTask"))
+                    .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
+            verify(taskService, times(0)).addTask(any(Task.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /newTask endpoint tests")
+    class PostNewTaskTest {
 
         @Test
         @DisplayName("should add a new task")
@@ -142,7 +159,7 @@ class TaskControllerTest {
 
             // When/then
             mockMvc.perform(
-                            post("/tasks")
+                            post("/newTask")
                                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                     .param("name", "krant opzeggen")
                                     .param("description", "krant opzeggen")

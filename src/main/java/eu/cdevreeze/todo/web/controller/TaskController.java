@@ -61,12 +61,17 @@ public class TaskController {
             }
         }
 
-        model.addAttribute("newTask", new TaskFormData());
-
         return "tasks";
     }
 
-    @PostMapping(value = "/tasks")
+    @GetMapping(value = "/newTask")
+    public String getFormToAddTask(Model model) {
+        model.addAttribute("newTask", new TaskFormData());
+
+        return "newTask";
+    }
+
+    @PostMapping(value = "/newTask")
     public String addTask(@ModelAttribute TaskFormData taskFormData) {
         Task task = Task.newTask(
                 taskFormData.getName(),

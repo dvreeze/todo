@@ -5,77 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Tasks</title>
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
 </head>
+<!-- For the Bootstrap Grid System, see https://getbootstrap.com/docs/5.2/layout/grid/ -->
 <body>
 <div class="container pt-5">
-    <div class="row">
-        <h2 th:text="${title}">Tasks</h2>
-        <table class="table table-bordered table-striped table-responsive-sm">
-            <thead>
-            <tr class="table-info">
-                <th>ID</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Target end</th>
-                <th>Extra information</th>
-                <th>Closed</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="task : ${tasks}">
-                <td th:text="${task.idOption.isPresent ? task.idOption.orElseThrow : ''}">id</td>
-                <td th:text="${task.name}">name</td>
-                <td th:text="${task.description}">description</td>
-                <td th:text="${task.targetEndOption.isPresent ? task.targetEndOption.orElseThrow : ''}">target end</td>
-                <td th:text="${task.extraInformationOption.orElse('')}">extra information</td>
-                <td th:text="${task.closed}">closed</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="row pt-2">
-        <hr>
-        <h2>Add new task</h2>
-        <!-- See https://www.baeldung.com/thymeleaf-in-spring-mvc -->
-        <!-- See https://getbootstrap.com/docs/5.1/layout/grid/ for a grid-based form layout -->
-        <form action="#" th:action="@{/tasks}" th:object="${newTask}" method="post">
-            <!-- Nested row -->
-            <div class="row row-cols-2">
-                <div class="col pt-2">
-                    <label for="name">Name:</label>
-                </div>
-                <div class="col pt-2">
-                    <input type="text" id="name" name="name>" th:field="*{name}" required />
-                </div>
-                <div class="col pt-2">
-                    <label for="description">Description:</label>
-                </div>
-                <div class="col pt-2">
-                    <input type="text" id="description" name="description" th:field="*{description}" required />
-                </div>
-                <div class="col pt-2">
-                    <label for="targetEnd">Target end (UTC):</label>
-                </div>
-                <div class="col pt-2">
-                    <input type="datetime-local" id="targetEnd" name="targetEnd" th:field="*{targetEnd}"/>
-                </div>
-                <div class="col pt-2">
-                    <label for="extraInformation">Extra information:</label>
-                </div>
-                <div class="col pt-2">
-                    <input type="text" id="extraInformation" name="extraInformation" th:field="*{extraInformation}"/>
-                </div>
-                <div class="col pt-2">
-                    <label for="closed">Closed:</label>
-                </div>
-                <div class="col pt-2">
-                    <input type="checkbox" id="closed" name="closed" th:field="*{closed}" />
-                </div>
-                <div class="col pt-2">
-                    <input type="submit" value="Save">
-                </div>
-            </div>
-        </form>
+    <div class="row gx-5">
+        <nav class="col-2">
+            <h4>Navigation</h4>
+            <menu>
+                <li><a th:href="@{/newTask}">Add task ...</a></li>
+                <li><a th:href="@{/tasks}">Get all tasks</a></li>
+                <li><a th:href="@{/tasks?closed=false}">Get all open tasks</a></li>
+                <li><a th:href="@{/tasks?closed=true}">Get all closed tasks</a></li>
+            </menu>
+        </nav>
+        <div class="col-10">
+            <h2 th:text="${title}">Tasks</h2>
+            <table class="table table-bordered table-striped table-responsive-sm">
+                <thead>
+                <tr class="table-info">
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Target end</th>
+                    <th>Extra information</th>
+                    <th>Closed</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="task : ${tasks}">
+                    <td th:text="${task.idOption.isPresent ? task.idOption.orElseThrow : ''}">id</td>
+                    <td th:text="${task.name}">name</td>
+                    <td th:text="${task.description}">description</td>
+                    <td th:text="${task.targetEndOption.isPresent ? task.targetEndOption.orElseThrow : ''}">target end
+                    </td>
+                    <td th:text="${task.extraInformationOption.orElse('')}">extra information</td>
+                    <td th:text="${task.closed}">closed</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <!--
