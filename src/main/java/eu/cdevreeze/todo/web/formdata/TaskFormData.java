@@ -84,7 +84,7 @@ public class TaskFormData {
     }
 
     public void setFormattedTargetEnd(String formattedTargetEnd) {
-        if (formattedTargetEnd == null) {
+        if (formattedTargetEnd == null || formattedTargetEnd.isBlank()) {
             setTargetEnd(null);
         } else {
             setTargetEnd(LocalDateTime.parse(formattedTargetEnd, dateTimeFormatter));
@@ -110,8 +110,8 @@ public class TaskFormData {
     public Task toModel() {
         return new Task(
                 Optional.ofNullable(this.getId()).stream().mapToLong(id -> id).findFirst(),
-                Optional.ofNullable(this.getName()).orElseThrow(),
-                Optional.ofNullable(this.getDescription()).orElseThrow(),
+                Optional.ofNullable(this.getName()).filter(v -> !v.isBlank()).orElseThrow(),
+                Optional.ofNullable(this.getDescription()).filter(v -> !v.isBlank()).orElseThrow(),
                 Optional.ofNullable(this.getTargetEnd())
                         .map(dt -> dt.toInstant(ZoneOffset.UTC).with(ChronoField.NANO_OF_SECOND, 0)),
                 Optional.ofNullable(this.getExtraInformation()).filter(v -> !v.isBlank()),
