@@ -22,53 +22,46 @@
             </menu>
         </nav>
         <div class="col-4">
-            <h2>Update existing task</h2>
             <!-- See https://www.baeldung.com/thymeleaf-in-spring-mvc -->
             <!-- See https://getbootstrap.com/docs/5.1/layout/grid/ for a grid-based form layout -->
             <form action="#" th:action="@{/updateTask}" th:object="${task}" method="post">
-                <!-- Nested row -->
-                <div class="row row-cols-2 gx-5 gy-2">
-                    <div class="col">
-                        <label for="id">ID:</label>
+                <fieldset>
+                    <legend>Update existing task</legend>
+                    <div>
+                        <label for="id" class="form-label mt-4">ID</label>
+                        <input type="text" class="form-control" id="id" name="id" th:field="*{id}" readonly="">
                     </div>
-                    <div class="col">
-                        <input type="text" id="id" name="id>" th:field="*{id}" readonly/>
+                    <div>
+                        <label for="name" class="form-label mt-4">Task name</label>
+                        <input type="text" class="form-control" id="name" name="name" th:field="*{name}" readonly="">
                     </div>
-                    <div class="col">
-                        <label for="name">Name:</label>
+                    <div>
+                        <label for="description" class="form-label mt-4">Description</label>
+                        <input type="text" class="form-control" id="description" name="description"
+                               th:field="*{description}" required="">
                     </div>
-                    <div class="col">
-                        <input type="text" id="name" name="name>" th:field="*{name}" readonly/>
+                    <div>
+                        <label for="targetEnd" class="form-label mt-4">Target end (UTC)</label>
+                        <input type="datetime-local" class="form-control" id="targetEnd" name="targetEnd"
+                               th:field="*{formattedTargetEnd}">
                     </div>
-                    <div class="col">
-                        <label for="description">Description:</label>
+                    <div>
+                        <label for="extraInformation" class="form-label mt-4">Description</label>
+                        <input type="text" class="form-control" id="extraInformation" name="extraInformation"
+                               th:field="*{extraInformation}">
                     </div>
-                    <div class="col">
-                        <input type="text" id="description" name="description" th:field="*{description}" required/>
-                    </div>
-                    <div class="col">
-                        <label for="targetEnd">Target end (UTC):</label>
-                    </div>
-                    <div class="col">
-                        <input type="datetime-local" id="targetEnd" name="targetEnd" th:field="*{formattedTargetEnd}"/>
-                    </div>
-                    <div class="col">
-                        <label for="extraInformation">Extra information:</label>
-                    </div>
-                    <div class="col">
-                        <input type="text" id="extraInformation" name="extraInformation"
-                               th:field="*{extraInformation}"/>
-                    </div>
-                    <div class="col">
-                        <label for="closed">Closed:</label>
-                    </div>
-                    <div class="col">
-                        <input type="checkbox" id="closed" name="closed" th:field="*{closed}"/>
-                    </div>
-                    <div class="col gy-5">
-                        <input type="submit" value="Save" class="save-button">
-                    </div>
-                </div>
+                    <fieldset>
+                        <legend class="mt-4">Status</legend>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="closed" th:field="*{closed}">
+                            <label class="form-check-label" for="closed">
+                                Closed
+                            </label>
+                        </div>
+                    </fieldset>
+                    <br>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </fieldset>
             </form>
         </div>
     </div>
