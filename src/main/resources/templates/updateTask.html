@@ -12,25 +12,7 @@
 <div class="container pt-5">
     <div class="row gx-5 gy-5">
         <div class="col-12">
-            <nav class="navbar navbar-expand-lg bg-light" data-bs-theme="light">
-                <div class="container-fluid">
-                    <div class="collapse navbar-collapse">
-                        <ul class="navbar-nav me-auto">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
-                                   aria-haspopup="true" aria-expanded="false">Tasks</a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" th:href="@{/tasks}">All tasks</a>
-                                    <a class="dropdown-item" th:href="@{/tasks?closed=false}">Open tasks</a>
-                                    <a class="dropdown-item" th:href="@{/tasks?closed=true}">Closed tasks</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" th:href="@{/newTask}">New task ...</a>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+            <div th:replace="fragments/header.html :: header"></div>
         </div>
         <div class="col-12">
             <!-- See https://www.baeldung.com/thymeleaf-in-spring-mvc -->
