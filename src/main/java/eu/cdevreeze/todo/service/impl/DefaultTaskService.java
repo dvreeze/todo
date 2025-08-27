@@ -150,6 +150,16 @@ public class DefaultTaskService implements TaskService {
 
     @Override
     @Transactional
+    public void deleteTask(long id) {
+        String jpaQuery = "delete from Task t where t.id = :id";
+
+        entityManager.createQuery(jpaQuery)
+                .setParameter("id", id)
+                .executeUpdate();
+    }
+
+    @Override
+    @Transactional
     public void deleteAllTasks() {
         entityManager.createQuery("delete from Task t").executeUpdate();
     }

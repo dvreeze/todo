@@ -87,6 +87,13 @@ curl -v \
   -d '{ "name": "mail regelen", "description": "overgaan op nieuwe mail provider", "targetEndOption": "2025-09-01T00:00:00Z", "extraInformationOption": null, "closed": false }' \
   http://localhost:8080/tasks.json
 
+# Deleting a task by task ID
+curl -v \
+  -X DELETE \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d 12 http://localhost:8080/tasks.json
+
 # Adding an address (as JSON)
 curl -v \
   -H 'Content-Type: application/json' \

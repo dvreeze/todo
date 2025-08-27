@@ -264,6 +264,30 @@ class TaskServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @DisplayName("should delete task")
+    void shouldDeleteTask() {
+        System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
+
+        List<Task> addedTasks = addSomeTasks();
+        int initSize = addedTasks.size();
+        Preconditions.checkArgument(initSize >= 3);
+
+        long id = addedTasks.get(1).idOption().orElseThrow();
+        taskService.deleteTask(id);
+
+        assertThat(
+                entityManager.getEntityManager()
+                        .createQuery("select t from Task t where t.id = :id")
+                        .setParameter("id", id)
+                        .getResultList()
+        ).isEmpty();
+
+        assertThat(
+                entityManager.getEntityManager().createQuery("select t from Task t").getResultList()
+        ).hasSize(initSize - 1);
+    }
+
+    @Test
     @DisplayName("should delete all tasks")
     void shouldDeleteAllTasks() {
         System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());

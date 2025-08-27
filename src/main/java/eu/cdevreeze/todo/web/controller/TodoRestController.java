@@ -71,6 +71,12 @@ public class TodoRestController {
         return taskService.addTask(task);
     }
 
+    @DeleteMapping(value = "/tasks.json", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Long deleteTask(@RequestBody Long id) {
+        taskService.deleteTask(id);
+        return id;
+    }
+
     @GetMapping(value = "/addresses.json", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Address> findAllAddresses() {
         return addressService.findAllAddresses();

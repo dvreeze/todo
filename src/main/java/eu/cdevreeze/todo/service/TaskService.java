@@ -48,5 +48,7 @@ public interface TaskService {
      */
     Task updateTask(Task task);
 
+    void deleteTask(long id);
+
     void deleteAllTasks();
 }
