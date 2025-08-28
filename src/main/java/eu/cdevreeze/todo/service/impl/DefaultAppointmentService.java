@@ -19,11 +19,17 @@ package eu.cdevreeze.todo.service.impl;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.entity.AddressEntity;
+import eu.cdevreeze.todo.entity.AddressEntity_;
 import eu.cdevreeze.todo.entity.AppointmentEntity;
+import eu.cdevreeze.todo.entity.AppointmentEntity_;
 import eu.cdevreeze.todo.model.Appointment;
 import eu.cdevreeze.todo.service.AppointmentService;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,11 +55,15 @@ public class DefaultAppointmentService implements AppointmentService {
     @Transactional(readOnly = true)
     public ImmutableList<Appointment> findAllAppointments() {
         EntityGraph<AppointmentEntity> eg = entityManager.createEntityGraph(AppointmentEntity.class);
-        eg.addAttributeNodes("address");
+        eg.addSubgraph(AppointmentEntity_.address);
 
-        String jpaQuery = "select ap from Appointment ap";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AppointmentEntity> cq = cb.createQuery(AppointmentEntity.class);
 
-        return entityManager.createQuery(jpaQuery, AppointmentEntity.class)
+        Root<AppointmentEntity> appointmentRoot = cq.from(AppointmentEntity.class);
+        cq.select(appointmentRoot);
+
+        return entityManager.createQuery(cq)
                 .setHint("jakarta.persistence.fetchgraph", eg)
                 .getResultStream()
                 .map(AppointmentEntity::toModel)
@@ -64,13 +74,21 @@ public class DefaultAppointmentService implements AppointmentService {
     @Transactional(readOnly = true)
     public ImmutableList<Appointment> findAppointmentsBetween(Instant start, Instant end) {
         EntityGraph<AppointmentEntity> eg = entityManager.createEntityGraph(AppointmentEntity.class);
-        eg.addAttributeNodes("address");
+        eg.addSubgraph(AppointmentEntity_.address);
 
-        String jpaQuery = "select ap from Appointment ap where ap.start >= :start and ap.end < :end";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AppointmentEntity> cq = cb.createQuery(AppointmentEntity.class);
 
-        return entityManager.createQuery(jpaQuery, AppointmentEntity.class)
-                .setParameter("start", start)
-                .setParameter("end", end)
+        Root<AppointmentEntity> appointmentRoot = cq.from(AppointmentEntity.class);
+        cq.where(
+                cb.and(
+                        cb.greaterThanOrEqualTo(appointmentRoot.get(AppointmentEntity_.start), start),
+                        cb.lessThan(appointmentRoot.get(AppointmentEntity_.end), end)
+                )
+        );
+        cq.select(appointmentRoot);
+
+        return entityManager.createQuery(cq)
                 .setHint("jakarta.persistence.fetchgraph", eg)
                 .getResultStream()
                 .map(AppointmentEntity::toModel)
@@ -81,12 +99,16 @@ public class DefaultAppointmentService implements AppointmentService {
     @Transactional(readOnly = true)
     public ImmutableList<Appointment> findAppointmentsEndingAfter(Instant end) {
         EntityGraph<AppointmentEntity> eg = entityManager.createEntityGraph(AppointmentEntity.class);
-        eg.addAttributeNodes("address");
+        eg.addSubgraph(AppointmentEntity_.address);
 
-        String jpaQuery = "select ap from Appointment ap where ap.end > :end";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AppointmentEntity> cq = cb.createQuery(AppointmentEntity.class);
 
-        return entityManager.createQuery(jpaQuery, AppointmentEntity.class)
-                .setParameter("end", end)
+        Root<AppointmentEntity> appointmentRoot = cq.from(AppointmentEntity.class);
+        cq.where(cb.greaterThan(appointmentRoot.get(AppointmentEntity_.end), end));
+        cq.select(appointmentRoot);
+
+        return entityManager.createQuery(cq)
                 .setHint("jakarta.persistence.fetchgraph", eg)
                 .getResultStream()
                 .map(AppointmentEntity::toModel)
@@ -97,12 +119,16 @@ public class DefaultAppointmentService implements AppointmentService {
     @Transactional(readOnly = true)
     public ImmutableList<Appointment> findAppointmentsEndingBefore(Instant end) {
         EntityGraph<AppointmentEntity> eg = entityManager.createEntityGraph(AppointmentEntity.class);
-        eg.addAttributeNodes("address");
+        eg.addSubgraph(AppointmentEntity_.address);
 
-        String jpaQuery = "select ap from Appointment ap where ap.end < :end";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AppointmentEntity> cq = cb.createQuery(AppointmentEntity.class);
 
-        return entityManager.createQuery(jpaQuery, AppointmentEntity.class)
-                .setParameter("end", end)
+        Root<AppointmentEntity> appointmentRoot = cq.from(AppointmentEntity.class);
+        cq.where(cb.lessThan(appointmentRoot.get(AppointmentEntity_.end), end));
+        cq.select(appointmentRoot);
+
+        return entityManager.createQuery(cq)
                 .setHint("jakarta.persistence.fetchgraph", eg)
                 .getResultStream()
                 .map(AppointmentEntity::toModel)
@@ -118,11 +144,14 @@ public class DefaultAppointmentService implements AppointmentService {
         if (appointment.addressNameOption().isPresent()) {
             String addressName = appointment.addressNameOption().orElseThrow();
 
-            String addressQuery = "select addr from Address addr where addr.addressName = :addressName";
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
 
-            AddressEntity address = entityManager.createQuery(addressQuery, AddressEntity.class)
-                    .setParameter("addressName", addressName)
-                    .getSingleResult();
+            Root<AddressEntity> addressRoot = cq.from(AddressEntity.class);
+            cq.where(cb.equal(addressRoot.get(AddressEntity_.addressName), addressName));
+            cq.select(addressRoot);
+
+            AddressEntity address = entityManager.createQuery(cq).getSingleResult();
 
             appointmentEntity.setAddress(address);
         }
@@ -138,6 +167,9 @@ public class DefaultAppointmentService implements AppointmentService {
     @Override
     @Transactional
     public void deleteAllAppointments() {
-        entityManager.createQuery("delete from Appointment ap").executeUpdate();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<AppointmentEntity> cd = cb.createCriteriaDelete(AppointmentEntity.class);
+
+        entityManager.createQuery(cd).executeUpdate();
     }
 }

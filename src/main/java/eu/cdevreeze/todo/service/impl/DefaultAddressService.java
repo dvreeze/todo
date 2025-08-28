@@ -22,6 +22,10 @@ import eu.cdevreeze.todo.entity.AddressEntity;
 import eu.cdevreeze.todo.model.Address;
 import eu.cdevreeze.todo.service.AddressService;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,9 +48,13 @@ public class DefaultAddressService implements AddressService {
     @Override
     @Transactional(readOnly = true)
     public ImmutableList<Address> findAllAddresses() {
-        String jpaQuery = "select ad from Address ad";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
 
-        return entityManager.createQuery(jpaQuery, AddressEntity.class)
+        Root<AddressEntity> addressRoot = cq.from(AddressEntity.class);
+        cq.select(addressRoot);
+
+        return entityManager.createQuery(cq)
                 .getResultStream()
                 .map(AddressEntity::toModel)
                 .collect(ImmutableList.toImmutableList());
@@ -69,6 +77,9 @@ public class DefaultAddressService implements AddressService {
     @Override
     @Transactional
     public void deleteAllAddresses() {
-        entityManager.createQuery("delete from Address ad").executeUpdate();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<AddressEntity> cd = cb.createCriteriaDelete(AddressEntity.class);
+
+        entityManager.createQuery(cd).executeUpdate();
     }
 }

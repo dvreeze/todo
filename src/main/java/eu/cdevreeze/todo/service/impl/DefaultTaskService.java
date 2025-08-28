@@ -19,9 +19,14 @@ package eu.cdevreeze.todo.service.impl;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.entity.TaskEntity;
+import eu.cdevreeze.todo.entity.TaskEntity_;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TaskService;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,9 +52,13 @@ public class DefaultTaskService implements TaskService {
     @Override
     @Transactional(readOnly = true)
     public ImmutableList<Task> findAllTasks() {
-        String jpaQuery = "select t from Task t";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TaskEntity> cq = cb.createQuery(TaskEntity.class);
 
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
+        Root<TaskEntity> taskRoot = cq.from(TaskEntity.class);
+        cq.select(taskRoot);
+
+        return entityManager.createQuery(cq)
                 .getResultStream()
                 .map(TaskEntity::toModel)
                 .collect(ImmutableList.toImmutableList());
@@ -58,10 +67,14 @@ public class DefaultTaskService implements TaskService {
     @Override
     @Transactional(readOnly = true)
     public ImmutableList<Task> findAllOpenTasks() {
-        String jpaQuery = "select t from Task t where closed = :closed";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TaskEntity> cq = cb.createQuery(TaskEntity.class);
 
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("closed", false)
+        Root<TaskEntity> taskRoot = cq.from(TaskEntity.class);
+        cq.where(cb.equal(taskRoot.get(TaskEntity_.closed), false));
+        cq.select(taskRoot);
+
+        return entityManager.createQuery(cq)
                 .getResultStream()
                 .map(TaskEntity::toModel)
                 .collect(ImmutableList.toImmutableList());
@@ -70,10 +83,14 @@ public class DefaultTaskService implements TaskService {
     @Override
     @Transactional(readOnly = true)
     public ImmutableList<Task> findAllClosedTasks() {
-        String jpaQuery = "select t from Task t where closed = :closed";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TaskEntity> cq = cb.createQuery(TaskEntity.class);
 
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("closed", true)
+        Root<TaskEntity> taskRoot = cq.from(TaskEntity.class);
+        cq.where(cb.equal(taskRoot.get(TaskEntity_.closed), true));
+        cq.select(taskRoot);
+
+        return entityManager.createQuery(cq)
                 .getResultStream()
                 .map(TaskEntity::toModel)
                 .collect(ImmutableList.toImmutableList());
@@ -82,10 +99,14 @@ public class DefaultTaskService implements TaskService {
     @Override
     @Transactional(readOnly = true)
     public ImmutableList<Task> findTasksHavingTargetEndAfter(Instant end) {
-        String jpaQuery = "select t from Task t where t.targetEnd > :end";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TaskEntity> cq = cb.createQuery(TaskEntity.class);
 
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("end", end)
+        Root<TaskEntity> taskRoot = cq.from(TaskEntity.class);
+        cq.where(cb.greaterThan(taskRoot.get(TaskEntity_.targetEnd), end));
+        cq.select(taskRoot);
+
+        return entityManager.createQuery(cq)
                 .getResultStream()
                 .map(TaskEntity::toModel)
                 .collect(ImmutableList.toImmutableList());
@@ -94,10 +115,14 @@ public class DefaultTaskService implements TaskService {
     @Override
     @Transactional(readOnly = true)
     public ImmutableList<Task> findTasksHavingTargetEndBefore(Instant end) {
-        String jpaQuery = "select t from Task t where t.targetEnd < :end";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TaskEntity> cq = cb.createQuery(TaskEntity.class);
 
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("end", end)
+        Root<TaskEntity> taskRoot = cq.from(TaskEntity.class);
+        cq.where(cb.lessThan(taskRoot.get(TaskEntity_.targetEnd), end));
+        cq.select(taskRoot);
+
+        return entityManager.createQuery(cq)
                 .getResultStream()
                 .map(TaskEntity::toModel)
                 .collect(ImmutableList.toImmutableList());
@@ -106,10 +131,14 @@ public class DefaultTaskService implements TaskService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Task> findTask(long id) {
-        String jpaQuery = "select t from Task t where t.id = :id";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TaskEntity> cq = cb.createQuery(TaskEntity.class);
 
-        return entityManager.createQuery(jpaQuery, TaskEntity.class)
-                .setParameter("id", id)
+        Root<TaskEntity> taskRoot = cq.from(TaskEntity.class);
+        cq.where(cb.equal(taskRoot.get(TaskEntity_.id), id));
+        cq.select(taskRoot);
+
+        return entityManager.createQuery(cq)
                 .getResultStream()
                 .map(TaskEntity::toModel)
                 .findFirst();
@@ -151,16 +180,20 @@ public class DefaultTaskService implements TaskService {
     @Override
     @Transactional
     public void deleteTask(long id) {
-        String jpaQuery = "delete from Task t where t.id = :id";
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<TaskEntity> cd = cb.createCriteriaDelete(TaskEntity.class);
 
-        entityManager.createQuery(jpaQuery)
-                .setParameter("id", id)
-                .executeUpdate();
+        cd.where(cb.equal(cd.getRoot().get(TaskEntity_.id), id));
+
+        entityManager.createQuery(cd).executeUpdate();
     }
 
     @Override
     @Transactional
     public void deleteAllTasks() {
-        entityManager.createQuery("delete from Task t").executeUpdate();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<TaskEntity> cd = cb.createCriteriaDelete(TaskEntity.class);
+
+        entityManager.createQuery(cd).executeUpdate();
     }
 }
