@@ -41,6 +41,8 @@ public interface TaskService {
 
     Optional<Task> findTask(long id);
 
+    Optional<Task> findTaskByName(String name);
+
     Task addTask(Task task);
 
     /**

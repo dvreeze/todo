@@ -195,6 +195,36 @@ class TaskServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    @DisplayName("should return a task with the given name")
+    void shouldReturnTaskByName() {
+        System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());
+
+        List<Task> addedTasks = addSomeTasks();
+        Preconditions.checkArgument(addedTasks.size() >= 3);
+        Task selectedTask = addedTasks.get(1);
+
+        String taskName = "stofzuigen kamer";
+        Preconditions.checkArgument(selectedTask.name().equals(taskName));
+
+        Optional<Task> taskOption = taskService.findTaskByName(taskName);
+
+        assertThat(taskOption)
+                .isNotNull()
+                .isNotEmpty()
+                .get()
+                .satisfies(task -> {
+                    assertThat(task.idOption()).isEqualTo(selectedTask.idOption());
+                    assertThat(task.name()).isEqualTo(taskName);
+                    assertThat(task.description()).isEqualTo(selectedTask.description());
+                    assertThat(task.targetEndOption()).isEqualTo(selectedTask.targetEndOption());
+                    assertThat(task.extraInformationOption()).isEqualTo(selectedTask.extraInformationOption());
+                    assertThat(task.closed()).isEqualTo(selectedTask.closed());
+
+                    assertThat(task).isEqualTo(selectedTask);
+                });
+    }
+
+    @Test
     @DisplayName("should add task")
     void shouldAddTask() {
         System.out.printf("PostgreSQL container name: %s%n", postgres.getContainerName());

@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.entity.TaskEntity;
 import eu.cdevreeze.todo.entity.TaskEntity_;
+import eu.cdevreeze.todo.exception.TaskExistsException;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TaskService;
 import jakarta.persistence.EntityManager;
@@ -145,9 +146,31 @@ public class DefaultTaskService implements TaskService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<Task> findTaskByName(String name) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TaskEntity> cq = cb.createQuery(TaskEntity.class);
+
+        Root<TaskEntity> taskRoot = cq.from(TaskEntity.class);
+        cq.where(cb.equal(taskRoot.get(TaskEntity_.name), name));
+        cq.select(taskRoot);
+
+        return entityManager.createQuery(cq)
+                .getResultStream()
+                .map(TaskEntity::toModel)
+                .findFirst();
+    }
+
+    @Override
     @Transactional
     public Task addTask(Task task) {
         Preconditions.checkArgument(task.idOption().isEmpty());
+
+        // Self call
+        if (findTaskByName(task.name()).isPresent()) {
+            throw new TaskExistsException(task);
+        }
+
         TaskEntity taskEntity = TaskEntity.fromModel(task);
 
         entityManager.persist(taskEntity);

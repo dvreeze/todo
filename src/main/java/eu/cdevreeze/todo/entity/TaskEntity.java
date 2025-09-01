@@ -36,7 +36,7 @@ public class TaskEntity {
     @SequenceGenerator(name = "Task_seq_gen", sequenceName = "Task_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
