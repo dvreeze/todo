@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TaskService;
 import eu.cdevreeze.todo.web.controller.TaskController;
+import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(TaskController.class)
 @ExtendWith(MockitoExtension.class)
+@NullUnmarked
 class TaskControllerTest {
 
     private final static Instant now = Instant.now();

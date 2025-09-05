@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.todo.entity.TaskEntity;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TaskService;
+import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Chris de Vreeze
  */
+@NullUnmarked
 class TaskServiceTest extends AbstractServiceTest {
 
     // TODO Use SpringExtension (and automatic TX rollback)

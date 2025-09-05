@@ -21,6 +21,7 @@ import eu.cdevreeze.todo.service.AppointmentService;
 import eu.cdevreeze.todo.service.TaskService;
 import eu.cdevreeze.todo.web.controller.TodoRestController;
 import jakarta.persistence.EntityManager;
+import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Chris de Vreeze
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@NullUnmarked
 class TodoApplicationIT {
 
     @Autowired

@@ -27,6 +27,7 @@ import eu.cdevreeze.todo.service.AddressService;
 import eu.cdevreeze.todo.service.AppointmentService;
 import eu.cdevreeze.todo.service.TaskService;
 import eu.cdevreeze.todo.web.controller.TodoRestController;
+import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -57,6 +58,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(TodoRestController.class)
 @ExtendWith(MockitoExtension.class)
+@NullUnmarked
 class TodoRestControllerTest {
 
     @Autowired
