@@ -20,4 +20,7 @@
  *
  * @author Chris de Vreeze
  */
+@NullMarked
 package eu.cdevreeze.todo.web;
+
+import org.jspecify.annotations.NullMarked;

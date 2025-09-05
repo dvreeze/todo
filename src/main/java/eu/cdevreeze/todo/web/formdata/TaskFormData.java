@@ -17,6 +17,7 @@
 package eu.cdevreeze.todo.web.formdata;
 
 import eu.cdevreeze.todo.model.Task;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -33,49 +34,49 @@ public class TaskFormData {
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    private Long id;
-    private String name;
-    private String description;
-    private LocalDateTime targetEnd;
-    private String extraInformation;
+    private @Nullable Long id;
+    private @Nullable String name;
+    private @Nullable String description;
+    private @Nullable LocalDateTime targetEnd;
+    private @Nullable String extraInformation;
     private boolean closed;
 
-    public Long getId() {
+    public @Nullable Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(@Nullable Long id) {
         this.id = id;
     }
 
-    public String getName() {
+    public @Nullable String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@Nullable String name) {
         this.name = name;
     }
 
-    public String getDescription() {
+    public @Nullable String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(@Nullable String description) {
         this.description = description;
     }
 
-    public LocalDateTime getTargetEnd() {
+    public @Nullable LocalDateTime getTargetEnd() {
         return targetEnd;
     }
 
-    public void setTargetEnd(LocalDateTime targetEnd) {
+    public void setTargetEnd(@Nullable LocalDateTime targetEnd) {
         this.targetEnd = targetEnd;
     }
 
     // Inspired by https://blog.devatlant.com/blog/2018/02/25/how-to-fix-datetime-local-input-in-chrome/
     // Used for HTML input element of type datetime-local
 
-    public String getFormattedTargetEnd() {
+    public @Nullable String getFormattedTargetEnd() {
         if (targetEnd == null) {
             return null;
         } else {
@@ -83,7 +84,7 @@ public class TaskFormData {
         }
     }
 
-    public void setFormattedTargetEnd(String formattedTargetEnd) {
+    public void setFormattedTargetEnd(@Nullable String formattedTargetEnd) {
         if (formattedTargetEnd == null || formattedTargetEnd.isBlank()) {
             setTargetEnd(null);
         } else {
@@ -91,11 +92,11 @@ public class TaskFormData {
         }
     }
 
-    public String getExtraInformation() {
+    public @Nullable String getExtraInformation() {
         return extraInformation;
     }
 
-    public void setExtraInformation(String extraInformation) {
+    public void setExtraInformation(@Nullable String extraInformation) {
         this.extraInformation = extraInformation;
     }
 

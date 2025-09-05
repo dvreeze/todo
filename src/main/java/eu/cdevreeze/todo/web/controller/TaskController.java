@@ -19,6 +19,7 @@ package eu.cdevreeze.todo.web.controller;
 import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.TaskService;
 import eu.cdevreeze.todo.web.formdata.TaskFormData;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +43,7 @@ public class TaskController {
 
     @GetMapping(value = "/tasks")
     public String findAllTasks(
-            @RequestParam(name = "closed", required = false) Boolean isClosed,
+            @RequestParam(name = "closed", required = false) @Nullable Boolean isClosed,
             Model model
     ) {
         if (isClosed == null) {

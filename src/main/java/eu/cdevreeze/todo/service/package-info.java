@@ -33,4 +33,7 @@
  *
  * @author Chris de Vreeze
  */
+@NullMarked
 package eu.cdevreeze.todo.service;
+
+import org.jspecify.annotations.NullMarked;

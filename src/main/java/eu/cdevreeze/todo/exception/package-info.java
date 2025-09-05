@@ -19,4 +19,7 @@
  *
  * @author Chris de Vreeze
  */
+@NullMarked
 package eu.cdevreeze.todo.exception;
+
+import org.jspecify.annotations.NullMarked;

@@ -15,18 +15,11 @@
  */
 
 /**
- * Domain as immutable data classes, using immutable Guava collections for collection-valued data.
- * <p>
- * These classes are immutable record classes, so they have well-defined value equality.
- * Also, with these data classes what you see is what you get: no lazy loading, no proxying, and no
- * hidden state.
- * <p>
- * These immutable data classes help make the abstract service API completely technology-agnostic,
- * which also enhanced testability of higher layers than the service layer.
+ * HTTP message converter classes.
  *
  * @author Chris de Vreeze
  */
 @NullMarked
-package eu.cdevreeze.todo.model;
+package eu.cdevreeze.todo.web.messageconverter;
 
 import org.jspecify.annotations.NullMarked;

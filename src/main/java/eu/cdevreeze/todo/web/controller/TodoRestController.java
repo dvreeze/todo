@@ -23,6 +23,7 @@ import eu.cdevreeze.todo.model.Task;
 import eu.cdevreeze.todo.service.AddressService;
 import eu.cdevreeze.todo.service.AppointmentService;
 import eu.cdevreeze.todo.service.TaskService;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +54,7 @@ public class TodoRestController {
 
     @GetMapping(value = "/tasks.json", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Task> findAllTasks(
-            @RequestParam(name = "closed", required = false) Boolean isClosed
+            @RequestParam(name = "closed", required = false) @Nullable Boolean isClosed
     ) {
         if (isClosed == null) {
             return taskService.findAllTasks();
@@ -89,8 +90,8 @@ public class TodoRestController {
 
     @GetMapping(value = "/appointments.json", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Appointment> findAllAppointments(
-            @RequestParam(name = "start", required = false) Instant start,
-            @RequestParam(name = "end", required = false) Instant end
+            @RequestParam(name = "start", required = false) @Nullable Instant start,
+            @RequestParam(name = "end", required = false) @Nullable Instant end
     ) {
         if (start == null) {
             Preconditions.checkArgument(end == null);
